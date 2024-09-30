@@ -13,29 +13,46 @@
   }
 }
 
-body:has(#light:checked) {
+body:has(#light-mode:checked) {
   --color: #333;
   --outline: #aaa;
   --background: #ddd;
 }
 
-.toggle {
-  font-size: 0.825rem;
-  text-align: right;
-}
-
-.toggle label {
+label {
   cursor: pointer;
 }
 
-.toggle #light,
-.toggle #light + label .light,
-.toggle #light:checked + label .dark {
+/* Checkbox remains visually hidden */
+input.toggle {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+input.toggle + label {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+input.toggle:focus-visible + label {
+  outline: solid var(--outline);
+}
+
+input.toggle + label .light,
+input.toggle:checked + label .dark {
   display: none;
 }
 
-.toggle #light + label .dark,
-.toggle #light:checked + label .light {
+input.toggle + label .dark,
+input.toggle:checked + label .light {
   display: block;
 }
 
@@ -71,6 +88,16 @@ body {
   background: var(--background);
   position: relative;
   transition: all .2s ease-out;
+}
+
+header {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  gap: .5rem;
+  font-size: 0.825rem;
+  text-align: right;
+  padding: .25rem;
 }
 
 main {

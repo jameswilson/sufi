@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-  const id = ".toggle #light";
+  const id = "#light-mode";
   const checkbox = document.querySelector(id);
 
   // Check if the localStorage variable exists and update the checkbox state.

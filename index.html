@@ -4,20 +4,33 @@
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="./reset.css">
-<link rel="stylesheet" href="./style.css">
+<link rel="stylesheet" href="reset.css">
+<link rel="stylesheet" href="style.css">
+<script src="toggle.js"></script>
 <title>Sufi Prayer</title>
-<!--meta http-equiv="refresh" content="0;URL='en.html'" -->
 </head>
 <body>
 <header>
-  <div class="toggle">
-    <input id="light" type="checkbox">
-    <label for="light">
-      <span class="dark">[Dark mode]</span>
-      <span class="light">[Light mode]</span>
-    </label>
-  </div>
+  <input id="light-mode" class="toggle" type="checkbox">
+  <label for="light-mode">
+    <svg class="dark" width="30" height="30">
+      <title>Bright light</title>
+      <circle cx="15" cy="15" r="6" fill="currentColor" />
+      <line id="ray" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" x1="15" y1="1" x2="15" y2="4"></line>
+      <use href="#ray" transform="rotate(45 15 15)" />
+      <use href="#ray" transform="rotate(90 15 15)" />
+      <use href="#ray" transform="rotate(135 15 15)" />
+      <use href="#ray" transform="rotate(180 15 15)" />
+      <use href="#ray" transform="rotate(225 15 15)" />
+      <use href="#ray" transform="rotate(270 15 15)" />
+      <use href="#ray" transform="rotate(315 15 15)" />
+    </svg>
+    <svg class="light" width="30" height="30">
+      <title>Low light</title>
+      <path fill="currentColor" d="M 23, 5 A 12 12 0 1 0 23, 25 A 12 12 0 0 1 23, 5" />
+    </svg>
+  </label>
 </header>
 <main>
 <h1>Sufi Prayers - Hazrat Inayat Khan</h1>
