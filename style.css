@@ -1,0 +1,162 @@
+:root {
+  --color: #d69b03;
+  --outline: #ba8b12;
+  --background: #000;
+  --font-size: 19px;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --color: #595959;
+    --outline: #909090;
+    --background: #ddd;
+  }
+}
+
+body:has(#light:checked) {
+  --color: #595959;
+  --outline: #909090;
+  --background: #ddd;
+}
+
+.toggle {
+  font-size: 0.825rem;
+  text-align: right;
+}
+
+.toggle label {
+  cursor: pointer;
+}
+
+.toggle #light,
+.toggle #light + label .light,
+.toggle #light:checked + label .dark {
+  display: none;
+}
+
+.toggle #light + label .dark,
+.toggle #light:checked + label .light {
+  display: block;
+}
+
+@media (min-width: 768px) {
+  :root {
+   --font-size: 20px;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --font-size: 21px;
+  }
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --font-size: 22px;
+  }
+}
+
+html {
+  font-size: var(--font-size);
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: Charter, 'Bitstream Charter', 'Sitka Text', Cambria, serif;
+  font-weight: normal;
+  font-size: 1rem;
+  line-height: 1.625;
+  color: var(--color);
+  background: var(--background);
+  position: relative;
+  transition: all .2s ease-out;
+}
+
+main {
+  /* position: relative; */
+  padding: 4rem 4vw;
+  margin: 0 auto;
+  max-width: 45rem;
+}
+
+nav {
+  margin: 1rem 0;
+  font-size: 0.825rem;
+  text-align: center;
+}
+
+nav a {
+  padding: 0.15rem 0.5rem;
+  display: inline-block;
+  text-decoration: none;
+}
+
+nav a[aria-current] {
+  outline: solid var(--outline);
+}
+
+nav:has(:focus) a[aria-current]:not(:focus),
+nav:has(:hover) a[aria-current]:not(:hover) {
+  outline: none;
+}
+
+h1 {
+  text-align: center;
+  font-size: 1.6rem;
+  line-height: normal;
+  font-weight: normal;
+}
+
+h2 {
+  font-size: 1.6rem;
+  font-weight: normal;
+  font-weight: normal;
+  margin-top: 1.5rem;
+}
+
+p {
+  white-space: pre-wrap;
+  margin: 1.5rem 0;
+}
+
+a, a:visited {
+  color: var(--color);
+  text-decoration: underline;
+}
+
+a:focus,
+a:hover {
+  outline: solid var(--outline);
+}
+
+.back-to-top {
+  position: absolute;
+  top: 120vh;
+  bottom: 4vh;
+  right: 4vw;
+}
+
+.back-to-top a {
+  background: var(--background);
+  color: var(--color);
+  border: 1px solid;
+  position: sticky;
+  top: 90vh;
+  display: flex;
+  width: 44px;
+  height: 44px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  opacity: .5;
+  transition: opacity .2 ease-out;
+}
+
+.back-to-top a:active {
+  opacity: 1;
+}
+
+.back-to-top svg {
+  margin-top: -3px;
+}
