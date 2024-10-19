@@ -2,7 +2,7 @@
   --color: #d69b03;
   --outline: #ba8b12;
   --background: #000;
-  --font-size: 19px;
+  --font-size: calc(18px + 0.390625vw);
 }
 
 @media (prefers-color-scheme: light) {
@@ -56,34 +56,18 @@ input.toggle:checked + label .light {
   display: block;
 }
 
-@media (min-width: 768px) {
-  :root {
-   --font-size: 20px;
-  }
-}
-
-@media (min-width: 1024px) {
-  :root {
-    --font-size: 21px;
-  }
-}
-
-@media (min-width: 1280px) {
-  :root {
-    --font-size: 22px;
-  }
-}
-
 html {
   font-size: var(--font-size);
   scroll-behavior: smooth;
+  -webkit-font-smoothing: subpixel-antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 body {
   font-family: Charter, 'Bitstream Charter', 'Sitka Text', Cambria, serif;
   font-weight: normal;
   font-size: 1rem;
-  line-height: 1.625;
+  line-height: 1.62;
   color: var(--color);
   background: var(--background);
   position: relative;
@@ -101,8 +85,7 @@ header {
 }
 
 main {
-  /* position: relative; */
-  padding: 4rem 4vw;
+  padding: 8vw 4vw;
   margin: 0 auto;
   max-width: 45rem;
 }
