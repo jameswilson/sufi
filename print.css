@@ -1,0 +1,14 @@
+:root {
+  --font-size: 14px;
+}
+
+header,
+nav,
+.back-to-top {
+  display: none;
+}
+
+main {
+  margin: 2mm 9mm;
+  padding: 0;
+}
