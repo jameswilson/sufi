@@ -8,12 +8,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Monitor for changes to the checkbox state.
   checkbox.addEventListener("change", function () {
-    if (checkbox.checked) {
-      // Set the localStorage item when checkbox is checked.
-      localStorage.setItem(id, true);
-    } else {
-      // Remove the localStorage item when checkbox is unchecked.
-      localStorage.removeItem(id);
-    }
+    localStorage.setItem(id, checkbox.checked);
   });
 });
