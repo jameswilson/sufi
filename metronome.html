@@ -82,18 +82,17 @@
     const timerDisplay = document.getElementById("timer");
 
     let playInterval = null;
-    let chimeTimeout = null;
     let timerInterval = null;
     const tickIntervalMs = 1000; // 1 second (60 BPM)
     let chimeIntervalMs = parseFloat(chimeIntervalSelect.value) * 60000;
 
     let secondsElapsed = 0;
+    let nextChimeAt = chimeIntervalMs / 1000; // Next chime time in seconds
 
     // Start the metronome
     function startMetronome() {
       playSound(); // Play the woodblock immediately on start
       playInterval = setInterval(playSound, tickIntervalMs); // Tick every second
-      startChime(); // Start the chime based on selected interval
       resetTimer();
       startTimer();
       toggleIcons(true);
@@ -102,10 +101,8 @@
     // Stop the metronome and chime
     function stopMetronome() {
       clearInterval(playInterval);
-      clearTimeout(chimeTimeout);
       clearInterval(timerInterval);
       playInterval = null;
-      chimeTimeout = null;
       toggleIcons(false);
     }
 
@@ -113,18 +110,6 @@
     function playSound() {
       audioElement.currentTime = 0;
       audioElement.play();
-    }
-
-    // Start chime notification based on interval
-    function startChime() {
-      // Skip if the chime interval is set to "off" (0)
-      if (chimeIntervalMs > 0) {
-        chimeTimeout = setTimeout(() => {
-          chimeElement.currentTime = 0;
-          chimeElement.play();
-          startChime(); // Reset the chime interval
-        }, chimeIntervalMs);
-      }
     }
 
     // Toggle button icons and label
@@ -143,9 +128,10 @@
     // Update chime interval on dropdown change
     chimeIntervalSelect.addEventListener("change", () => {
       chimeIntervalMs = parseFloat(chimeIntervalSelect.value) * 60000;
-      if (playInterval !== null) { // If metronome is running, restart the chime with the new interval
-        clearTimeout(chimeTimeout);
-        startChime();
+      if (chimeIntervalMs > 0) {
+        nextChimeAt = Math.ceil(secondsElapsed / (chimeIntervalMs / 1000)) * (chimeIntervalMs / 1000);
+      } else {
+        nextChimeAt = Infinity; // No chime if set to "off"
       }
     });
 
@@ -154,6 +140,7 @@
       timerInterval = setInterval(() => {
         secondsElapsed++;
         updateTimerDisplay();
+        checkChime();
       }, 1000);
     }
 
@@ -161,12 +148,22 @@
       clearInterval(timerInterval);
       secondsElapsed = 0;
       updateTimerDisplay();
+      nextChimeAt = chimeIntervalMs > 0 ? chimeIntervalMs / 1000 : Infinity;
     }
 
     function updateTimerDisplay() {
       const minutes = Math.floor(secondsElapsed / 60);
       const seconds = secondsElapsed % 60;
       timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+
+    // Check if it's time to play the chime
+    function checkChime() {
+      if (chimeIntervalMs > 0 && secondsElapsed >= nextChimeAt) {
+        chimeElement.currentTime = 0;
+        chimeElement.play();
+        nextChimeAt += chimeIntervalMs / 1000; // Schedule next chime based on elapsed time
+      }
     }
 
     // Toggle metronome on button click
@@ -181,7 +178,6 @@
     // Clean up intervals if the page is closed
     window.addEventListener("beforeunload", () => {
       if (playInterval !== null) clearInterval(playInterval);
-      if (chimeTimeout !== null) clearTimeout(chimeTimeout);
       if (timerInterval !== null) clearInterval(timerInterval);
     });
   </script>
