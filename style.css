@@ -140,6 +140,22 @@ a:hover {
   outline: solid var(--outline);
 }
 
+select,
+option {
+  color: var(--color);
+  background: var(--background);
+  font-family: Charter, 'Bitstream Charter', 'Sitka Text', Cambria, serif;
+  font-weight: normal;
+  font-size: 1rem;
+  line-height: 1.62;
+  text-align: center;
+}
+
+select {
+  border: 0;
+  border-bottom: 1px solid;
+}
+
 .back-to-top {
   position: absolute;
   top: 120vh;

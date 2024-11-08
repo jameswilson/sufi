@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="reset.css">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="print.css" media="print">
+  <script src="toggle.js"></script>
+  <title>Metronome</title>
+  <style>
+    #toggleButton {
+      width: 50px;
+      height: 50px;
+      cursor: pointer;
+      border: none;
+      background: none;
+      outline: none;
+    }
+
+    .icon {
+      fill: var(--color);
+      width: 100%;
+      height: 100%;
+    }
+
+    #chimeInterval {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <audio id="woodblock" src="freesound.org-692819-woodblock.wav"></audio>
+  <audio id="chime" src="freesound.org-240934-chime.wav"></audio>
+
+  <button id="toggleButton" aria-label="Play">
+    <svg id="playIcon" class="icon" xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24">
+      <polygon points="5,3 19,12 5,21"></polygon>
+    </svg>
+    <svg id="stopIcon" class="icon" xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24" style="display: none;">
+      <rect x="6" y="6" width="12" height="12"></rect>
+    </svg>
+  </button>
+
+  <!-- Chime Interval Dropdown -->
+  <label for="chimeInterval">Chime:</label>
+  <select id="chimeInterval">
+    <option value="0">off</option>
+    <option value="0.5">every 30 seconds</option>
+    <option value="1">every 1 minute</option>
+    <option value="2">every 2 minutes</option>
+    <option value="5">every 5 minutes</option>
+    <option value="10">every 10 minutes</option>
+    <option value="15">every 15 minutes</option>
+    <option value="20">every 20 minutes</option>
+    <option value="30">every 30 minutes</option>
+    <option value="45">every 45 minutes</option>
+    <option value="60">every 60 minutes</option>
+  </select>
+
+  <script>
+    const audioElement = document.getElementById("woodblock");
+    const chimeElement = document.getElementById("chime");
+    const toggleButton = document.getElementById("toggleButton");
+    const playIcon = document.getElementById("playIcon");
+    const stopIcon = document.getElementById("stopIcon");
+    const chimeIntervalSelect = document.getElementById("chimeInterval");
+
+    let playInterval = null;
+    let chimeTimeout = null;
+    const tickIntervalMs = 1000; // 1 second (60 BPM)
+    let chimeIntervalMs = parseFloat(chimeIntervalSelect.value) * 60000;
+
+    // Start the metronome
+    function startMetronome() {
+      playSound(); // Play the woodblock immediately on start
+      playInterval = setInterval(playSound, tickIntervalMs); // Tick every second
+      startChime(); // Start the chime based on selected interval
+      toggleIcons(true);
+    }
+
+    // Stop the metronome and chime
+    function stopMetronome() {
+      clearInterval(playInterval);
+      clearTimeout(chimeTimeout);
+      playInterval = null;
+      chimeTimeout = null;
+      toggleIcons(false);
+    }
+
+    // Play the woodblock sound
+    function playSound() {
+      audioElement.currentTime = 0;
+      audioElement.play();
+    }
+
+    // Start chime notification based on interval
+    function startChime() {
+      // Skip if the chime interval is set to "off" (0)
+      if (chimeIntervalMs > 0) {
+        chimeTimeout = setTimeout(() => {
+          chimeElement.currentTime = 0;
+          chimeElement.play();
+          startChime(); // Reset the chime interval
+        }, chimeIntervalMs);
+      }
+    }
+
+    // Toggle button icons and label
+    function toggleIcons(isPlaying) {
+      if (isPlaying) {
+        playIcon.style.display = "none";
+        stopIcon.style.display = "inline";
+        toggleButton.setAttribute("aria-label", "Stop");
+      } else {
+        playIcon.style.display = "inline";
+        stopIcon.style.display = "none";
+        toggleButton.setAttribute("aria-label", "Play");
+      }
+    }
+
+    // Update chime interval on dropdown change
+    chimeIntervalSelect.addEventListener("change", () => {
+      chimeIntervalMs = parseFloat(chimeIntervalSelect.value) * 60000;
+      if (playInterval !== null) { // If metronome is running, restart the chime with the new interval
+        clearTimeout(chimeTimeout);
+        startChime();
+      }
+    });
+
+    // Toggle metronome on button click
+    toggleButton.addEventListener("click", () => {
+      if (playInterval === null) {
+        startMetronome();
+      } else {
+        stopMetronome();
+      }
+    });
+
+    // Clean up intervals if the page is closed
+    window.addEventListener("beforeunload", () => {
+      if (playInterval !== null) clearInterval(playInterval);
+      if (chimeTimeout !== null) clearTimeout(chimeTimeout);
+    });
+  </script>
+</body>
+
+</html>
