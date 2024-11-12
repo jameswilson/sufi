@@ -147,10 +147,22 @@ option {
   font-weight: normal;
   font-size: 1rem;
   line-height: 1.62;
-  text-align: center;
+  text-align: left;
+}
+
+button {
+  border: none;
+  background: none;
+  font-family: Charter, 'Bitstream Charter', 'Sitka Text', Cambria, serif;
+  font-weight: normal;
+  font-size: 1rem;
+  line-height: 1.62;
+  color: var(--color);
 }
 
 select {
+  margin: 0;
+  padding: 0;
   border: 0;
   border-bottom: 1px solid;
 }

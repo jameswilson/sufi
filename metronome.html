@@ -11,74 +11,173 @@
   <script src="toggle.js"></script>
   <title>Metronome</title>
   <style>
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #playerWrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      margin: auto;
+      max-width: 300px;
+    }
+
+    #chimeIntervalControls,
+    #metronomeControls,
+    #chimeControls {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 0.5rem;
+      width: 100%;
+      line-height: normal;
+    }
+
+    #metronomeControls {
+      font-size: 2.5rem;
+    }
+
+    #chimeControls,
+    #chimeIntervalControls {
+      font-size: 1.2rem;
+    }
+
     #toggleButton {
-      width: 50px;
-      height: 50px;
+      width: 1.5em;
+      height: 1.5em;
       cursor: pointer;
       border: none;
       background: none;
       outline: none;
     }
 
+    #testChimeButton {
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+      border: none;
+      background: none;
+      outline: none;
+    }
+
+    #chimeIntervalLabel {
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+      border: none;
+      background: none;
+      outline: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #chimeInterval,
+    #chimeTone {
+      width: 100%;
+    }
+
     .icon {
-      fill: var(--color);
       width: 100%;
       height: 100%;
     }
 
-    #chimeInterval {
-      margin-top: 10px;
-    }
-
-    #timer {
-      font-size: 1.5em;
-      margin-top: 10px;
-    }
   </style>
 </head>
 
 <body>
 
-  <audio id="woodblock" src="freesound.org-692819-woodblock.wav"></audio>
-  <audio id="chime" src="freesound.org-240934-chime.wav"></audio>
+  <div id="playerWrapper">
+    <audio id="woodblock" src="freesound.org-692819-woodblock.mp3"></audio>
+    <audio id="chime" src="freesound.org-240934-bell-low.mp3"></audio>
 
-  <button id="toggleButton" aria-label="Play">
-    <svg id="playIcon" class="icon" xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24">
-      <polygon points="5,3 19,12 5,21"></polygon>
-    </svg>
-    <svg id="stopIcon" class="icon" xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24" style="display: none;">
-      <rect x="6" y="6" width="12" height="12"></rect>
-    </svg>
-  </button>
+    <div id="metronomeControls">
+      <button id="toggleButton" aria-label="Play">
+        <svg id="playIcon" class="icon" viewBox="0 0 15 15" fill="none"
+          xmlns="http://www.w3.org/2000/svg">
+          <g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <path
+              d="M7.84729 14.25C11.4371 14.25 14.3473 11.3399 14.3473 7.75C14.3473 4.16015 11.4371 1.25 7.84729 1.25C4.25744 1.25 1.34729 4.16015 1.34729 7.75C1.34729 11.3399 4.25744 14.25 7.84729 14.25Z" />
+            <path d="M6.34729 5.25L10.3473 7.75L6.34729 10.25V5.25Z" />
+          </g>
+        </svg>
+        <svg id="stopIcon"  class="icon" viewBox="0 0 15 15" fill="none"
+          xmlns="http://www.w3.org/2000/svg" style="display: none;">
+          <g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <path
+              d="M7.84729 14.25C11.4371 14.25 14.3473 11.3399 14.3473 7.75C14.3473 4.16015 11.4371 1.25 7.84729 1.25C4.25744 1.25 1.34729 4.16015 1.34729 7.75C1.34729 11.3399 4.25744 14.25 7.84729 14.25Z" />
+            <path d="M6.34729 5.25V10.25" />
+            <path d="M9.34729 5.25V10.25" />
+          </g>
+        </svg>
+      </button>
 
-  <!-- Chime Interval Dropdown -->
-  <label for="chimeInterval">Chime:</label>
-  <select id="chimeInterval">
-    <option value="0">off</option>
-    <option value="0.5">every 30 seconds</option>
-    <option value="1">every 1 minute</option>
-    <option value="2">every 2 minutes</option>
-    <option value="5">every 5 minutes</option>
-    <option value="10">every 10 minutes</option>
-    <option value="15">every 15 minutes</option>
-    <option value="20">every 20 minutes</option>
-    <option value="30">every 30 minutes</option>
-    <option value="45">every 45 minutes</option>
-    <option value="60">every 60 minutes</option>
-  </select>
+      <!-- Timer Display -->
+      <div id="timer">00:00</div>
+    </div>
 
-  <!-- Timer Display -->
-  <div id="timer">00:00</div>
+    <div id="chimeControls">
+      <button id="testChimeButton" aria-label="Test Chime">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M6 13.25h2M11 5.75a4 4 0 1 0-8 0v3.5a1.5 1.5 0 0 1-1.5 1.5h11a1.5 1.5 0 0 1-1.5-1.5zM.5 5.62A6 6 0 0 1 3 .75M13.5 5.62A6 6 0 0 0 11 .75"/></svg>
+      </button>
+      <!-- Chime Tone Dropdown -->
+      <label class="visually-hidden" for="chimeTone">Tone</label>
+      <select id="chimeTone">
+        <option value="freesound.org-390543-bell-mid.mp3">bell</option>
+        <option value="freesound.org-347379-bell-high.mp3">chime</option>
+        <option value="freesound.org-240934-bell-low.mp3">gong</option>
+      </select>
+    </div>
 
+    <div id="chimeIntervalControls">
+      <!-- Chime Interval Dropdown -->
+      <label id="chimeIntervalLabel" for="chimeInterval">
+        <span class="visually-hidden">Interval</span>
+        <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <path
+              d="M7 13.5C10.0376 13.5 12.5 11.0376 12.5 8C12.5 4.96243 10.0376 2.5 7 2.5C3.96243 2.5 1.5 4.96243 1.5 8C1.5 11.0376 3.96243 13.5 7 13.5Z" />
+            <path d="M0.5 2.5C1.20228 1.68425 2.04999 1.00608 3 0.5" />
+            <path d="M13.5 2.5C12.7977 1.68425 11.95 1.00608 11 0.5" />
+            <path d="M7 5V8H9.5" />
+          </g>
+        </svg>
+      </label>
+      <select id="chimeInterval">
+        <option value="0">off</option>
+        <option value="0.5">every 30 seconds</option>
+        <option value="1">every 1 minute</option>
+        <option value="2">every 2 minutes</option>
+        <option value="5">every 5 minutes</option>
+        <option value="10">every 10 minutes</option>
+        <option value="15">every 15 minutes</option>
+        <option value="20">every 20 minutes</option>
+        <option value="30">every 30 minutes</option>
+        <option value="45">every 45 minutes</option>
+        <option value="60">every 60 minutes</option>
+      </select>
+    </div>
+  </div>
   <script>
     const audioElement = document.getElementById("woodblock");
     const chimeElement = document.getElementById("chime");
     const toggleButton = document.getElementById("toggleButton");
+    const testChimeButton = document.getElementById("testChimeButton");
     const playIcon = document.getElementById("playIcon");
     const stopIcon = document.getElementById("stopIcon");
     const chimeIntervalSelect = document.getElementById("chimeInterval");
+    const chimeToneSelect = document.getElementById("chimeTone");
     const timerDisplay = document.getElementById("timer");
 
     let playInterval = null;
@@ -112,6 +211,12 @@
       audioElement.play();
     }
 
+    // Play selected chime tone on test button click
+    testChimeButton.addEventListener("click", () => {
+      chimeElement.currentTime = 0;
+      chimeElement.play();
+    });
+
     // Toggle button icons and label
     function toggleIcons(isPlaying) {
       if (isPlaying) {
@@ -133,6 +238,11 @@
       } else {
         nextChimeAt = Infinity; // No chime if set to "off"
       }
+    });
+
+    // Update chime tone on dropdown change
+    chimeToneSelect.addEventListener("change", () => {
+      chimeElement.src = chimeToneSelect.value;
     });
 
     // Timer functions
