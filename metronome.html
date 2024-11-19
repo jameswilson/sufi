@@ -202,8 +202,24 @@
     let secondsElapsed = 0;
     let nextChimeAt = chimeIntervalMs / 1000; // Next chime time in seconds
 
+    // Ensure AudioContext is created and resumed on user interaction.
+    let audioContext = null;
+    async function resumeAudioContext() {
+      // Create the AudioContext with latencyHint.
+      if (!audioContext) {
+        audioContext = new AudioContext({ latencyHint: "interactive" });
+        const audioSource = audioContext.createMediaElementSource(audioElement);
+        audioSource.connect(audioContext.destination);
+      }
+      // Resume AudioContext if suspended.
+      else if (audioContext.state === "suspended") {
+        audioContext.resume();
+      }
+    }
+
     // Start the metronome
-    function startMetronome() {
+    async function startMetronome() {
+      await resumeAudioContext(); // Resume AudioContext before starting.
       playSound(); // Play the woodblock immediately on start
       playInterval = setInterval(playSound, tickIntervalMs); // Tick every second
       resetTimer();
@@ -222,11 +238,12 @@
     // Play the woodblock sound
     function playSound() {
       audioElement.currentTime = 0;
-      audioElement.play();
+        audioElement.play().catch((error) => console.error("Playback error:", error));
     }
 
     // Play selected chime tone on test button click
-    testChimeButton.addEventListener("click", () => {
+    testChimeButton.addEventListener("click", async () => {
+      await resumeAudioContext();
       chimeElement.currentTime = 0;
       chimeElement.play();
     });
