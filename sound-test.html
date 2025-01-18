@@ -62,99 +62,64 @@
     Sound Test
   </header>
   <div id="playerWrapper">
-    <audio id="woodblock" src="freesound.org-692819-woodblock.mp3" preload="auto"></audio>
+    <audio id="woodblock" src="freesound.org-692819-woodblock.mp3"
+      preload="auto"></audio>
 
     <div id="metronomeControls">
-      <button id="toggleButton" aria-label="Play">
-        Play/Pause
-      </button>
-
-      <!-- Timer Display -->
+      <button id="toggleButton" aria-label="Play">Play</button>
       <div id="timer">00:00</div>
     </div>
   </div>
 
   <script>
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    const audio = document.getElementById('woodblock');
+    const audioElement = document.getElementById('woodblock');
     const toggleButton = document.getElementById('toggleButton');
     const timerDisplay = document.getElementById('timer');
 
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let audioBuffer = null;
     let isPlaying = false;
-    let startTime;
-    let elapsedTime = 0;
-    let audioBuffer;
-    let nextTickTime = 0;
-    let timerID;
+    let intervalId = null;
+    let elapsedSeconds = 0;
 
-    // Load and decode audio file
-    async function initAudio() {
-      const response = await fetch(audio.src);
+    async function loadAudioFromElement(elem) {
+      const response = await fetch(elem.src);
       const arrayBuffer = await response.arrayBuffer();
-      audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+      audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
     }
 
-    initAudio().catch(console.error);
-
-    toggleButton.addEventListener('click', () => {
-      // Resume audio context on user interaction
-      if (audioContext.state === 'suspended') {
-        audioContext.resume();
-      }
-
-      if (isPlaying) {
-        stop();
-      } else {
-        start();
-      }
-    });
-
-    function scheduleSound(time) {
-      const source = audioContext.createBufferSource();
-      source.buffer = audioBuffer;
-      source.connect(audioContext.destination);
-      source.start(time);
-    }
-
-    function scheduler() {
-      while (nextTickTime < audioContext.currentTime + 0.1) {
-        scheduleSound(nextTickTime);
-        nextTickTime += 1.0; // Schedule next tick 1 second later
-      }
-      timerID = requestAnimationFrame(scheduler);
-    }
-
-    function updateTimer() {
-      if (!isPlaying) return;
-
-      const now = audioContext.currentTime;
-      const diff = now - startTime;
-      const seconds = Math.floor(diff);
-      const minutes = Math.floor(seconds / 60);
-      const displaySeconds = seconds % 60;
-
-      timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(displaySeconds).padStart(2, '0')}`;
-      requestAnimationFrame(updateTimer);
-    }
-
-    function start() {
+    function playSound() {
       if (!audioBuffer) return;
-
-      isPlaying = true;
-      toggleButton.textContent = 'Pause';
-
-      startTime = audioContext.currentTime;
-      nextTickTime = audioContext.currentTime + 1.0; // Start first tick after 1 second
-
-      scheduler();
-      updateTimer();
+      const source = audioCtx.createBufferSource();
+      source.buffer = audioBuffer;
+      source.connect(audioCtx.destination);
+      source.start(0);
     }
 
-    function stop() {
-      isPlaying = false;
-      toggleButton.textContent = 'Play';
-      cancelAnimationFrame(timerID);
+    function togglePlayback() {
+      if (!isPlaying) {
+        // Start playing every second
+        isPlaying = true;
+        toggleButton.textContent = 'Pause';
+        intervalId = setInterval(() => {
+          playSound();
+          elapsedSeconds++;
+          timerDisplay.textContent = new Date(elapsedSeconds * 1000)
+            .toISOString().substr(14, 5); // mm:ss
+        }, 1000);
+      } else {
+        // Stop
+        isPlaying = false;
+        toggleButton.textContent = 'Play';
+        clearInterval(intervalId);
+        intervalId = null;
+      }
     }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      await loadAudioFromElement(audioElement);
+      toggleButton.addEventListener('click', togglePlayback);
+    });
   </script>
 </body>
 
