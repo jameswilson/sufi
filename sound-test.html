@@ -75,6 +75,7 @@
   </div>
 
   <script>
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
     const audio = document.getElementById('woodblock');
     const toggleButton = document.getElementById('toggleButton');
     const timerDisplay = document.getElementById('timer');
@@ -82,9 +83,25 @@
     let isPlaying = false;
     let startTime;
     let elapsedTime = 0;
-    let lastSecond = 0;
+    let audioBuffer;
+    let nextTickTime = 0;
+    let timerID;
+
+    // Load and decode audio file
+    async function initAudio() {
+      const response = await fetch(audio.src);
+      const arrayBuffer = await response.arrayBuffer();
+      audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+    }
+
+    initAudio().catch(console.error);
 
     toggleButton.addEventListener('click', () => {
+      // Resume audio context on user interaction
+      if (audioContext.state === 'suspended') {
+        audioContext.resume();
+      }
+
       if (isPlaying) {
         stop();
       } else {
@@ -92,40 +109,51 @@
       }
     });
 
+    function scheduleSound(time) {
+      const source = audioContext.createBufferSource();
+      source.buffer = audioBuffer;
+      source.connect(audioContext.destination);
+      source.start(time);
+    }
+
+    function scheduler() {
+      while (nextTickTime < audioContext.currentTime + 0.1) {
+        scheduleSound(nextTickTime);
+        nextTickTime += 1.0; // Schedule next tick 1 second later
+      }
+      timerID = requestAnimationFrame(scheduler);
+    }
+
+    function updateTimer() {
+      if (!isPlaying) return;
+
+      const now = audioContext.currentTime;
+      const diff = now - startTime;
+      const seconds = Math.floor(diff);
+      const minutes = Math.floor(seconds / 60);
+      const displaySeconds = seconds % 60;
+
+      timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(displaySeconds).padStart(2, '0')}`;
+      requestAnimationFrame(updateTimer);
+    }
+
     function start() {
+      if (!audioBuffer) return;
+
       isPlaying = true;
       toggleButton.textContent = 'Pause';
-      startTime = performance.now() - elapsedTime;
-      requestAnimationFrame(update);
+
+      startTime = audioContext.currentTime;
+      nextTickTime = audioContext.currentTime + 1.0; // Start first tick after 1 second
+
+      scheduler();
+      updateTimer();
     }
 
     function stop() {
       isPlaying = false;
       toggleButton.textContent = 'Play';
-      elapsedTime = performance.now() - startTime;
-    }
-
-    function update() {
-      if (!isPlaying) return;
-
-      const now = performance.now();
-      const diff = now - startTime;
-      const seconds = Math.floor(diff / 1000);
-      const minutes = Math.floor(seconds / 60);
-      const displaySeconds = seconds % 60;
-      timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(displaySeconds).padStart(2, '0')}`;
-
-      if (seconds !== lastSecond) {
-        playSound();
-        lastSecond = seconds;
-      }
-
-      requestAnimationFrame(update);
-    }
-
-    function playSound() {
-      audio.currentTime = 0;
-      audio.play();
+      cancelAnimationFrame(timerID);
     }
   </script>
 </body>
