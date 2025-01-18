@@ -62,7 +62,7 @@
     Sound Test
   </header>
   <div id="playerWrapper">
-    <audio id="woodblock" src="freesound.org-692819-woodblock.mp3"></audio>
+    <audio id="woodblock" src="freesound.org-692819-woodblock.mp3" preload="auto"></audio>
 
     <div id="metronomeControls">
       <button id="toggleButton" aria-label="Play">
@@ -73,115 +73,57 @@
       <div id="timer">00:00</div>
     </div>
   </div>
+
   <script>
-    const audioElement = document.getElementById("woodblock");
-    const timerDisplay = document.getElementById("timer");
-    const toggleButton = document.getElementById("toggleButton");
+    const audio = document.getElementById('woodblock');
+    const toggleButton = document.getElementById('toggleButton');
+    const timerDisplay = document.getElementById('timer');
 
-    let playInterval = null;
-    let timerInterval = null;
-    const tickIntervalMs = 1000; // 1 second (60 BPM)
+    let isPlaying = false;
+    let timerInterval;
+    let startTime;
+    let elapsedTime = 0;
 
-    let secondsElapsed = 0;
-    let nextTickTime = 0;
-    let audioBuffers = {};
-
-    // Initialize Web Audio API context with better timing
-    let audioContext = null;
-
-    async function initAudio() {
-      if (!audioContext) {
-        audioContext = new AudioContext({
-          latencyHint: "interactive",
-          sampleRate: 48000
-        });
-
-        // Pre-load and decode audio files
-        const response = await fetch(audioElement.src);
-        const arrayBuffer = await response.arrayBuffer();
-        audioBuffers.woodblock = await audioContext.decodeAudioData(arrayBuffer);
-      }
-
-      if (audioContext.state === "suspended") {
-        await audioContext.resume();
-      }
-    }
-
-    // Precise sound scheduling using Web Audio API
-    function scheduleSound(buffer, time) {
-      const source = audioContext.createBufferSource();
-      source.buffer = buffer;
-      source.connect(audioContext.destination);
-      source.start(time);
-    }
-
-    // Start the metronome with precise timing
-    async function startMetronome() {
-      await initAudio();
-
-      nextTickTime = audioContext.currentTime + 1; // Start at the first second
-      scheduleSound(audioBuffers.woodblock, nextTickTime);
-
-      // Schedule multiple ticks ahead to ensure smooth playback
-      function scheduler() {
-        while (nextTickTime < audioContext.currentTime + 0.1) {
-          scheduleSound(audioBuffers.woodblock, nextTickTime);
-          nextTickTime += tickIntervalMs / 1000;
-        }
-        playInterval = requestAnimationFrame(scheduler);
-      }
-
-      scheduler();
-      resetTimer();
-      startTimer();
-    }
-
-    // Stop the metronome
-    function stopMetronome() {
-      cancelAnimationFrame(playInterval);
-      clearInterval(timerInterval);
-      playInterval = null;
-    }
-
-    // Timer functions
-    function startTimer() {
-      timerInterval = setInterval(() => {
-        secondsElapsed++;
-        updateTimerDisplay();
-      }, 1000);
-    }
-
-    function resetTimer() {
-      clearInterval(timerInterval);
-      secondsElapsed = 0;
-      updateTimerDisplay();
-    }
-
-    function updateTimerDisplay() {
-      const minutes = Math.floor(secondsElapsed / 60);
-      const seconds = secondsElapsed % 60;
-      timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-    }
-
-    // Toggle metronome on button click
-    toggleButton.addEventListener("click", async () => {
-      if (playInterval === null) {
-        startMetronome();
+    toggleButton.addEventListener('click', () => {
+      if (isPlaying) {
+        stop();
       } else {
-        stopMetronome();
+        start();
       }
     });
 
-    // Clean up when page is closed
-    window.addEventListener("beforeunload", () => {
-      if (playInterval !== null) {
-        cancelAnimationFrame(playInterval);
-        clearInterval(timerInterval);
+    function start() {
+      isPlaying = true;
+      toggleButton.textContent = 'Pause';
+      startTime = Date.now() - elapsedTime;
+      timerInterval = setInterval(update, 1000);
+      playSound();
+    }
+
+    function stop() {
+      isPlaying = false;
+      toggleButton.textContent = 'Play';
+      clearInterval(timerInterval);
+      elapsedTime = Date.now() - startTime;
+    }
+
+    function update() {
+      const now = Date.now();
+      const diff = now - startTime;
+      const seconds = Math.floor(diff / 1000);
+      const minutes = Math.floor(seconds / 60);
+      const displaySeconds = seconds % 60;
+      timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(displaySeconds).padStart(2, '0')}`;
+
+      if (seconds > 0 && seconds % 1 === 0) {
+        playSound();
       }
-      if (audioContext) {
-        audioContext.close();
-      }
-    });
+    }
+
+    function playSound() {
+      audio.currentTime = 0;
+      audio.play();
+    }
   </script>
 </body>
 
