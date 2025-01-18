@@ -3,18 +3,18 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>iOS Audio Test</title>
+  <title>iOS Audio Test 3</title>
 </head>
 
 <body>
-  <button id="testButton">Play Tone 2</button>
+  <button id="testButton">Play Tone 3</button>
 
   <script>
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const testButton = document.getElementById('testButton');
 
-    testButton.addEventListener('click', async () => {
-      console.log('Attempted to play beep');
+    testButton.addEventListener('click', () => {
+      alert('Hello from button click');
     });
   </script>
 </body>
