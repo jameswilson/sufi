@@ -3,38 +3,42 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>iOS Audio Test 10</title>
+  <title>iOS Audio Test 11</title>
 </head>
 
 <body>
-  <button id="testButton">Play Tone 10</button>
+  <button id="testButton">Play Tone 11</button>
 
   <script>
     let audioCtx;
     let osc;
     const testButton = document.getElementById('testButton');
 
-    testButton.addEventListener('click', () => {
+    testButton.addEventListener('click', onPlayHandler);
+
+    async function onPlayHandler() {
+
       // Must resume the context in the exact user gesture
       if (!audioCtx) {
         audioCtx = new AudioContext();
-        audioCtx.resume();
+        alert("State before: " + audioCtx.state);
+        await audioCtx.resume();
+        alert("State after: " + audioCtx.state);
         osc = audioCtx.createOscillator();
         osc.type = 'sine';
         osc.frequency.value = 440;
         osc.connect(audioCtx.destination);
         osc.start();
         osc.stop(audioCtx.currentTime + 0.5);
-        alert('Audio context created and resumed');
       }
-      else if (audioCtx.state !== 'running') {
-        audioCtx.resume();
+      if (audioCtx.state !== 'running') {
+        alert("State before: " + audioCtx.state);
+        await audioCtx.resume();
+        alert("State after: " + audioCtx.state);
         osc.start();
         osc.stop(audioCtx.currentTime + 0.5);
-        alert('Audio context resumed');
       }
-      alert('Audio context state: ' + audioCtx.state);
-    });
+    }
   </script>
 </body>
 
