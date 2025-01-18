@@ -10,10 +10,12 @@
   <button id="testButton">Play Tone 12</button>
 
   <script>
-    const audioCtx = new AudioContext();
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const osc = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
     osc.type = 'sine';
     osc.frequency.value = 440;
+    gainNode.gain.value = 7.5;
     const testButton = document.getElementById('testButton');
 
     testButton.addEventListener('click', onPlayHandler);
@@ -24,7 +26,8 @@
         await audioCtx.resume();
         alert("State after: " + audioCtx.state);
       }
-      osc.connect(audioCtx.destination);
+      osc.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
       osc.start();
       osc.stop(audioCtx.currentTime + 0.5);
     }
