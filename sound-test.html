@@ -3,35 +3,39 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>iOS Audio Test 6</title>
+  <title>iOS Audio Test 7</title>
 </head>
 
 <body>
-  <button id="testButton">Play Tone 6</button>
+  <button id="testButton">Play Tone 7</button>
 
   <script>
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const testButton = document.getElementById('testButton');
 
-    testButton.addEventListener('click', async () => {
-      alert('Hello from button click');
+    testButton.addEventListener('click', () => {
+
       // Must resume the context in the exact user gesture
       if (audioCtx.state === 'suspended' || audioCtx.state === 'interrupted') {
-        await audioCtx.resume();
+        audioCtx.resume().then(() => {
+          playBeep();
+          alert('Audio context resumed from button click');
+        });
       }
+      else {
+        playBeep();
+        alert('Audio context not suspended');
+      }
+    });
 
-      // Create a short beep
+    function playBeep() {
       const osc = audioCtx.createOscillator();
       osc.type = 'sine';
       osc.frequency.value = 440;
       osc.connect(audioCtx.destination);
-
-      // Start and stop half a second later
       osc.start();
       osc.stop(audioCtx.currentTime + 0.5);
-
-      console.log('Attempted to play beep 6');
-    });
+    }
   </script>
 </body>
 
