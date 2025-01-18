@@ -201,27 +201,59 @@
 
     let secondsElapsed = 0;
     let nextChimeAt = chimeIntervalMs / 1000; // Next chime time in seconds
+    let nextTickTime = 0;
+    let audioBuffers = {};
 
-    // Ensure AudioContext is created and resumed on user interaction.
+    // Initialize Web Audio API context with better timing
     let audioContext = null;
-    async function resumeAudioContext() {
-      // Create the AudioContext with latencyHint.
+
+    async function initAudio() {
       if (!audioContext) {
-        audioContext = new AudioContext({ latencyHint: "interactive" });
-        const audioSource = audioContext.createMediaElementSource(audioElement);
-        audioSource.connect(audioContext.destination);
+        audioContext = new AudioContext({
+          latencyHint: "interactive",
+          sampleRate: 48000
+        });
+
+        // Pre-load and decode audio files
+        const response = await fetch(audioElement.src);
+        const arrayBuffer = await response.arrayBuffer();
+        audioBuffers.woodblock = await audioContext.decodeAudioData(arrayBuffer);
+
+        const chimeResponse = await fetch(chimeElement.src);
+        const chimeBuffer = await chimeResponse.arrayBuffer();
+        audioBuffers.chime = await audioContext.decodeAudioData(chimeBuffer);
       }
-      // Resume AudioContext if suspended.
-      else if (audioContext.state === "suspended") {
-        audioContext.resume();
+
+      if (audioContext.state === "suspended") {
+        await audioContext.resume();
       }
     }
 
-    // Start the metronome
+    // Precise sound scheduling using Web Audio API
+    function scheduleSound(buffer, time) {
+      const source = audioContext.createBufferSource();
+      source.buffer = buffer;
+      source.connect(audioContext.destination);
+      source.start(time);
+    }
+
+    // Start the metronome with precise timing
     async function startMetronome() {
-      await resumeAudioContext(); // Resume AudioContext before starting.
-      playSound(); // Play the woodblock immediately on start
-      playInterval = setInterval(playSound, tickIntervalMs); // Tick every second
+      await initAudio();
+
+      nextTickTime = audioContext.currentTime;
+      scheduleSound(audioBuffers.woodblock, nextTickTime);
+
+      // Schedule multiple ticks ahead to ensure smooth playback
+      function scheduler() {
+        while (nextTickTime < audioContext.currentTime + 0.1) {
+          scheduleSound(audioBuffers.woodblock, nextTickTime);
+          nextTickTime += tickIntervalMs / 1000;
+        }
+        playInterval = requestAnimationFrame(scheduler);
+      }
+
+      scheduler();
       resetTimer();
       startTimer();
       toggleIcons(true);
@@ -229,23 +261,16 @@
 
     // Stop the metronome and chime
     function stopMetronome() {
-      clearInterval(playInterval);
+      cancelAnimationFrame(playInterval);
       clearInterval(timerInterval);
       playInterval = null;
       toggleIcons(false);
     }
 
-    // Play the woodblock sound
-    function playSound() {
-      audioElement.currentTime = 0;
-        audioElement.play().catch((error) => console.error("Playback error:", error));
-    }
-
     // Play selected chime tone on test button click
     testChimeButton.addEventListener("click", async () => {
-      await resumeAudioContext();
-      chimeElement.currentTime = 0;
-      chimeElement.play();
+      await initAudio();
+      scheduleSound(audioBuffers.chime, audioContext.currentTime);
     });
 
     // Toggle button icons and label
@@ -267,13 +292,15 @@
       if (chimeIntervalMs > 0) {
         nextChimeAt = Math.ceil(secondsElapsed / (chimeIntervalMs / 1000)) * (chimeIntervalMs / 1000);
       } else {
-        nextChimeAt = Infinity; // No chime if set to "off"
+        nextChimeAt = Infinity;
       }
     });
 
     // Update chime tone on dropdown change
-    chimeToneSelect.addEventListener("change", () => {
-      chimeElement.src = chimeToneSelect.value;
+    chimeToneSelect.addEventListener("change", async () => {
+      const response = await fetch(chimeToneSelect.value);
+      const arrayBuffer = await response.arrayBuffer();
+      audioBuffers.chime = await audioContext.decodeAudioData(arrayBuffer);
     });
 
     // Timer functions
@@ -301,9 +328,8 @@
     // Check if it's time to play the chime
     function checkChime() {
       if (chimeIntervalMs > 0 && secondsElapsed >= nextChimeAt) {
-        chimeElement.currentTime = 0;
-        chimeElement.play();
-        nextChimeAt += chimeIntervalMs / 1000; // Schedule next chime based on elapsed time
+        scheduleSound(audioBuffers.chime, audioContext.currentTime);
+        nextChimeAt += chimeIntervalMs / 1000;
       }
     }
 
@@ -316,10 +342,15 @@
       }
     });
 
-    // Clean up intervals if the page is closed
+    // Clean up when page is closed
     window.addEventListener("beforeunload", () => {
-      if (playInterval !== null) clearInterval(playInterval);
-      if (timerInterval !== null) clearInterval(timerInterval);
+      if (playInterval !== null) {
+        cancelAnimationFrame(playInterval);
+        clearInterval(timerInterval);
+      }
+      if (audioContext) {
+        audioContext.close();
+      }
     });
   </script>
 </body>
