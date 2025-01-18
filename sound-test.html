@@ -59,7 +59,7 @@
 
 <body>
   <header>
-    <div>Sound Test 4</div>
+    <div>Sound Test 5</div>
   </header>
   <audio id="woodblock" src="freesound.org-692819-woodblock.mp3"
     preload="auto"></audio>
@@ -104,7 +104,17 @@
     }
 
     // Start or stop the scheduling loop
-    function togglePlay() {
+    async function togglePlay() {
+      if (audioCtx.state === 'suspended') {
+        await audioCtx.resume();
+      }
+
+      if (!audioBuffer) {
+        const response = await fetch(audioElement.src);
+        const arrayBuf = await response.arrayBuffer();
+        audioBuffer = await audioCtx.decodeAudioData(arrayBuf);
+      }
+
       if (!isPlaying) {
         isPlaying = true;
         startStopBtn.textContent = 'Stop';
@@ -121,9 +131,13 @@
       await loadAudioFromElement(audioElement);
       startStopBtn.addEventListener('click', async () => {
         if (audioCtx.state === 'suspended') {
-          await audioCtx.resume(); // Must be inside this exact event handler
+          await audioCtx.resume();
         }
-        togglePlay();
+        const osc = audioCtx.createOscillator();
+        osc.frequency.value = 440;
+        osc.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.5);
       });
     });
   </script>
