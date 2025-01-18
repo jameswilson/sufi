@@ -80,9 +80,9 @@
     const timerDisplay = document.getElementById('timer');
 
     let isPlaying = false;
-    let timerInterval;
     let startTime;
     let elapsedTime = 0;
+    let lastSecond = 0;
 
     toggleButton.addEventListener('click', () => {
       if (isPlaying) {
@@ -95,29 +95,32 @@
     function start() {
       isPlaying = true;
       toggleButton.textContent = 'Pause';
-      startTime = Date.now() - elapsedTime;
-      timerInterval = setInterval(update, 1000);
-      playSound();
+      startTime = performance.now() - elapsedTime;
+      requestAnimationFrame(update);
     }
 
     function stop() {
       isPlaying = false;
       toggleButton.textContent = 'Play';
-      clearInterval(timerInterval);
-      elapsedTime = Date.now() - startTime;
+      elapsedTime = performance.now() - startTime;
     }
 
     function update() {
-      const now = Date.now();
+      if (!isPlaying) return;
+
+      const now = performance.now();
       const diff = now - startTime;
       const seconds = Math.floor(diff / 1000);
       const minutes = Math.floor(seconds / 60);
       const displaySeconds = seconds % 60;
       timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(displaySeconds).padStart(2, '0')}`;
 
-      if (seconds > 0 && seconds % 1 === 0) {
+      if (seconds !== lastSecond) {
         playSound();
+        lastSecond = seconds;
       }
+
+      requestAnimationFrame(update);
     }
 
     function playSound() {
