@@ -1,144 +1,35 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sound Test</title>
-  <style>
-    html,
-    body {
-      height: 100%;
-    }
-
-    body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    #playerWrapper {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1rem;
-      margin: auto;
-      max-width: 300px;
-    }
-
-    #metronomeControls {
-      display: flex;
-      flex-direction: row;
-      justify-content: flex-start;
-      align-items: center;
-      gap: 0.5rem;
-      width: 100%;
-      line-height: normal;
-    }
-
-    #metronomeControls {
-      font-size: 2.5rem;
-    }
-
-    #toggleButton {
-      width: 1.5em;
-      height: 1.5em;
-      cursor: pointer;
-      border: none;
-      background: none;
-      outline: none;
-    }
-
-    .icon {
-      width: 100%;
-      height: 100%;
-    }
-  </style>
+  <title>iOS Audio Test</title>
 </head>
 
 <body>
-  <header>
-    <div>Sound Test 5</div>
-  </header>
-  <audio id="woodblock" src="freesound.org-692819-woodblock.mp3"
-    preload="auto"></audio>
-  <button id="startStopBtn">Start</button>
+  <button id="testButton">Play Tone</button>
 
   <script>
-    const audioElement = document.getElementById('woodblock');
-    const startStopBtn = document.getElementById('startStopBtn');
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    let audioBuffer = null;
+    const testButton = document.getElementById('testButton');
 
-    // Timing vars
-    let isPlaying = false;
-    let nextNoteTime = 0.0;          // next time a note is due
-    const scheduleAheadTime = 0.1;   // how far ahead (sec) we schedule notes
-    const lookAhead = 25;           // how frequently (ms) we check the schedule
-    let timerID;
-    let intervalSeconds = 1;         // interval between hits in seconds
-
-    // Load the file into an AudioBuffer
-    async function loadAudioFromElement(elem) {
-      const response = await fetch(elem.src);
-      const arrayBuf = await response.arrayBuffer();
-      audioBuffer = await audioCtx.decodeAudioData(arrayBuf);
-    }
-
-    // Schedules playback at a specific time
-    function scheduleNote(time) {
-      const source = audioCtx.createBufferSource();
-      source.buffer = audioBuffer;
-      source.connect(audioCtx.destination);
-      source.start(time);
-    }
-
-    // Called repeatedly; schedules notes slightly ahead of the current time
-    function scheduler() {
-      while (nextNoteTime < audioCtx.currentTime + scheduleAheadTime) {
-        scheduleNote(nextNoteTime);
-        // Move nextNoteTime forward by our interval
-        nextNoteTime += intervalSeconds;
-      }
-    }
-
-    // Start or stop the scheduling loop
-    async function togglePlay() {
+    testButton.addEventListener('click', async () => {
+      // Must resume the context in the exact user gesture
       if (audioCtx.state === 'suspended') {
         await audioCtx.resume();
       }
 
-      if (!audioBuffer) {
-        const response = await fetch(audioElement.src);
-        const arrayBuf = await response.arrayBuffer();
-        audioBuffer = await audioCtx.decodeAudioData(arrayBuf);
-      }
+      // Create a short beep
+      const osc = audioCtx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.value = 440;
+      osc.connect(audioCtx.destination);
 
-      if (!isPlaying) {
-        isPlaying = true;
-        startStopBtn.textContent = 'Stop';
-        nextNoteTime = audioCtx.currentTime;
-        timerID = setInterval(scheduler, lookAhead);
-      } else {
-        isPlaying = false;
-        startStopBtn.textContent = 'Start';
-        clearInterval(timerID);
-      }
-    }
+      // Start and stop half a second later
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.5);
 
-    document.addEventListener('DOMContentLoaded', async () => {
-      await loadAudioFromElement(audioElement);
-      startStopBtn.addEventListener('click', async () => {
-        if (audioCtx.state === 'suspended') {
-          await audioCtx.resume();
-        }
-        const osc = audioCtx.createOscillator();
-        osc.frequency.value = 440;
-        osc.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.5);
-      });
+      console.log('Attempted to play beep');
     });
   </script>
 </body>
