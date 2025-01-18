@@ -334,7 +334,27 @@
     }
 
     // Toggle metronome on button click
-    toggleButton.addEventListener("click", () => {
+    toggleButton.addEventListener("click", async () => {
+      if (!audioContext) {
+        audioContext = new AudioContext({
+          latencyHint: "interactive",
+          sampleRate: 48000
+        });
+
+        // Pre-load and decode audio files
+        const response = await fetch(audioElement.src);
+        const arrayBuffer = await response.arrayBuffer();
+        audioBuffers.woodblock = await audioContext.decodeAudioData(arrayBuffer);
+
+        const chimeResponse = await fetch(chimeElement.src);
+        const chimeBuffer = await chimeResponse.arrayBuffer();
+        audioBuffers.chime = await audioContext.decodeAudioData(chimeBuffer);
+      }
+
+      if (audioContext.state === "suspended") {
+        await audioContext.resume();
+      }
+
       if (playInterval === null) {
         startMetronome();
       } else {
