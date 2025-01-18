@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sound Test</title>
+  <style>
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #playerWrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      margin: auto;
+      max-width: 300px;
+    }
+
+    #metronomeControls {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 0.5rem;
+      width: 100%;
+      line-height: normal;
+    }
+
+    #metronomeControls {
+      font-size: 2.5rem;
+    }
+
+    #toggleButton {
+      width: 1.5em;
+      height: 1.5em;
+      cursor: pointer;
+      border: none;
+      background: none;
+      outline: none;
+    }
+
+    .icon {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    Sound Test
+  </header>
+  <div id="playerWrapper">
+    <audio id="woodblock" src="freesound.org-692819-woodblock.mp3"></audio>
+
+    <div id="metronomeControls">
+      <button id="toggleButton" aria-label="Play">
+        Play/Pause
+      </button>
+
+      <!-- Timer Display -->
+      <div id="timer">00:00</div>
+    </div>
+  </div>
+  <script>
+    const audioElement = document.getElementById("woodblock");
+    const timerDisplay = document.getElementById("timer");
+    const toggleButton = document.getElementById("toggleButton");
+
+    let playInterval = null;
+    let timerInterval = null;
+    const tickIntervalMs = 1000; // 1 second (60 BPM)
+
+    let secondsElapsed = 0;
+    let nextTickTime = 0;
+    let audioBuffers = {};
+
+    // Initialize Web Audio API context with better timing
+    let audioContext = null;
+
+    async function initAudio() {
+      if (!audioContext) {
+        audioContext = new AudioContext({
+          latencyHint: "interactive",
+          sampleRate: 48000
+        });
+
+        // Pre-load and decode audio files
+        const response = await fetch(audioElement.src);
+        const arrayBuffer = await response.arrayBuffer();
+        audioBuffers.woodblock = await audioContext.decodeAudioData(arrayBuffer);
+      }
+
+      if (audioContext.state === "suspended") {
+        await audioContext.resume();
+      }
+    }
+
+    // Precise sound scheduling using Web Audio API
+    function scheduleSound(buffer, time) {
+      const source = audioContext.createBufferSource();
+      source.buffer = buffer;
+      source.connect(audioContext.destination);
+      source.start(time);
+    }
+
+    // Start the metronome with precise timing
+    async function startMetronome() {
+      await initAudio();
+
+      nextTickTime = audioContext.currentTime + 1; // Start at the first second
+      scheduleSound(audioBuffers.woodblock, nextTickTime);
+
+      // Schedule multiple ticks ahead to ensure smooth playback
+      function scheduler() {
+        while (nextTickTime < audioContext.currentTime + 0.1) {
+          scheduleSound(audioBuffers.woodblock, nextTickTime);
+          nextTickTime += tickIntervalMs / 1000;
+        }
+        playInterval = requestAnimationFrame(scheduler);
+      }
+
+      scheduler();
+      resetTimer();
+      startTimer();
+    }
+
+    // Stop the metronome
+    function stopMetronome() {
+      cancelAnimationFrame(playInterval);
+      clearInterval(timerInterval);
+      playInterval = null;
+    }
+
+    // Timer functions
+    function startTimer() {
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        updateTimerDisplay();
+      }, 1000);
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval);
+      secondsElapsed = 0;
+      updateTimerDisplay();
+    }
+
+    function updateTimerDisplay() {
+      const minutes = Math.floor(secondsElapsed / 60);
+      const seconds = secondsElapsed % 60;
+      timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+
+    // Toggle metronome on button click
+    toggleButton.addEventListener("click", async () => {
+      if (playInterval === null) {
+        startMetronome();
+      } else {
+        stopMetronome();
+      }
+    });
+
+    // Clean up when page is closed
+    window.addEventListener("beforeunload", () => {
+      if (playInterval !== null) {
+        cancelAnimationFrame(playInterval);
+        clearInterval(timerInterval);
+      }
+      if (audioContext) {
+        audioContext.close();
+      }
+    });
+  </script>
+</body>
+
+</html>
