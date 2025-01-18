@@ -59,7 +59,7 @@
 
 <body>
   <header>
-    <div>Sound Test 2</div>
+    <div>Sound Test 3</div>
   </header>
   <audio id="woodblock" src="freesound.org-692819-woodblock.mp3"
     preload="auto"></audio>
@@ -105,10 +105,10 @@
 
     // Start or stop the scheduling loop
     function togglePlay() {
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
       if (!isPlaying) {
-        if (audioCtx.state === 'suspended') {
-          audioCtx.resume();
-        }
         isPlaying = true;
         startStopBtn.textContent = 'Stop';
         nextNoteTime = audioCtx.currentTime;
