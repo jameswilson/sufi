@@ -106,6 +106,9 @@
     // Start or stop the scheduling loop
     function togglePlay() {
       if (!isPlaying) {
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
         isPlaying = true;
         startStopBtn.textContent = 'Stop';
         nextNoteTime = audioCtx.currentTime;
