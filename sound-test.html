@@ -3,29 +3,25 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>iOS Audio Test 7</title>
+  <title>iOS Audio Test 8</title>
 </head>
 
 <body>
-  <button id="testButton">Play Tone 7</button>
+  <button id="testButton">Play Tone 8</button>
 
   <script>
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const testButton = document.getElementById('testButton');
 
     testButton.addEventListener('click', () => {
-
+      alert('Audio context state: ' + audioCtx.state);
       // Must resume the context in the exact user gesture
-      if (audioCtx.state === 'suspended' || audioCtx.state === 'interrupted') {
-        audioCtx.resume().then(() => {
-          playBeep();
-          alert('Audio context resumed from button click');
-        });
+      if (audioCtx.state !== 'suspended' || audioCtx.state === 'interrupted') {
+        audioCtx.resume();
+        alert('Audio context resumed');
       }
-      else {
-        playBeep();
-        alert('Audio context not suspended');
-      }
+      playBeep();
+      alert('Audio context not suspended');
     });
 
     function playBeep() {
