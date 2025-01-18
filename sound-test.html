@@ -59,66 +59,67 @@
 
 <body>
   <header>
-    Sound Test
+    <div>Sound Test</div>
   </header>
-  <div id="playerWrapper">
-    <audio id="woodblock" src="freesound.org-692819-woodblock.mp3"
-      preload="auto"></audio>
-
-    <div id="metronomeControls">
-      <button id="toggleButton" aria-label="Play">Play</button>
-      <div id="timer">00:00</div>
-    </div>
-  </div>
+  <audio id="woodblock" src="freesound.org-692819-woodblock.mp3"
+    preload="auto"></audio>
+  <button id="startStopBtn">Start</button>
 
   <script>
     const audioElement = document.getElementById('woodblock');
-    const toggleButton = document.getElementById('toggleButton');
-    const timerDisplay = document.getElementById('timer');
-
+    const startStopBtn = document.getElementById('startStopBtn');
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     let audioBuffer = null;
-    let isPlaying = false;
-    let intervalId = null;
-    let elapsedSeconds = 0;
 
+    // Timing vars
+    let isPlaying = false;
+    let nextNoteTime = 0.0;          // next time a note is due
+    const scheduleAheadTime = 0.1;   // how far ahead (sec) we schedule notes
+    const lookAhead = 25;           // how frequently (ms) we check the schedule
+    let timerID;
+    let intervalSeconds = 1;         // interval between hits in seconds
+
+    // Load the file into an AudioBuffer
     async function loadAudioFromElement(elem) {
       const response = await fetch(elem.src);
-      const arrayBuffer = await response.arrayBuffer();
-      audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+      const arrayBuf = await response.arrayBuffer();
+      audioBuffer = await audioCtx.decodeAudioData(arrayBuf);
     }
 
-    function playSound() {
-      if (!audioBuffer) return;
+    // Schedules playback at a specific time
+    function scheduleNote(time) {
       const source = audioCtx.createBufferSource();
       source.buffer = audioBuffer;
       source.connect(audioCtx.destination);
-      source.start(0);
+      source.start(time);
     }
 
-    function togglePlayback() {
+    // Called repeatedly; schedules notes slightly ahead of the current time
+    function scheduler() {
+      while (nextNoteTime < audioCtx.currentTime + scheduleAheadTime) {
+        scheduleNote(nextNoteTime);
+        // Move nextNoteTime forward by our interval
+        nextNoteTime += intervalSeconds;
+      }
+    }
+
+    // Start or stop the scheduling loop
+    function togglePlay() {
       if (!isPlaying) {
-        // Start playing every second
         isPlaying = true;
-        toggleButton.textContent = 'Pause';
-        intervalId = setInterval(() => {
-          playSound();
-          elapsedSeconds++;
-          timerDisplay.textContent = new Date(elapsedSeconds * 1000)
-            .toISOString().substr(14, 5); // mm:ss
-        }, 1000);
+        startStopBtn.textContent = 'Stop';
+        nextNoteTime = audioCtx.currentTime;
+        timerID = setInterval(scheduler, lookAhead);
       } else {
-        // Stop
         isPlaying = false;
-        toggleButton.textContent = 'Play';
-        clearInterval(intervalId);
-        intervalId = null;
+        startStopBtn.textContent = 'Start';
+        clearInterval(timerID);
       }
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
       await loadAudioFromElement(audioElement);
-      toggleButton.addEventListener('click', togglePlayback);
+      startStopBtn.addEventListener('click', togglePlay);
     });
   </script>
 </body>
