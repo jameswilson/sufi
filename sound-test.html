@@ -3,14 +3,15 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>iOS Audio Test 9</title>
+  <title>iOS Audio Test 10</title>
 </head>
 
 <body>
-  <button id="testButton">Play Tone 9</button>
+  <button id="testButton">Play Tone 10</button>
 
   <script>
     let audioCtx;
+    let osc;
     const testButton = document.getElementById('testButton');
 
     testButton.addEventListener('click', () => {
@@ -18,24 +19,22 @@
       if (!audioCtx) {
         audioCtx = new AudioContext();
         audioCtx.resume();
+        osc = audioCtx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.value = 440;
+        osc.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.5);
         alert('Audio context created and resumed');
       }
       else if (audioCtx.state !== 'running') {
         audioCtx.resume();
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.5);
         alert('Audio context resumed');
       }
       alert('Audio context state: ' + audioCtx.state);
-      playBeep();
     });
-
-    function playBeep() {
-      const osc = audioCtx.createOscillator();
-      osc.type = 'sine';
-      osc.frequency.value = 440;
-      osc.connect(audioCtx.destination);
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.5);
-    }
   </script>
 </body>
 
