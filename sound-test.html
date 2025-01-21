@@ -59,9 +59,12 @@
   <div id="contextState"></div>
   <button id="testButton">Play Tone 14</button>
 
+  <script src="unmute.min.js"></script>
   <script>
     const contextState = document.getElementById('contextState');
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let allowBackgroundPlayback = true;
+    unmute(audioCtx, allowBackgroundPlayback);
     contextState.textContent = audioCtx.state;
     setInterval(() => {
       contextState.textContent = audioCtx.state;
