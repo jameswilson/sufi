@@ -3,11 +3,31 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>iOS Audio Test 12</title>
+  <title>iOS Audio Test 13</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      color: #ccc;
+      background: #000;
+      text-align: center;
+      font-family: Arial, sans-serif;
+      font-size: 16px;
+      padding: 20px;
+    }
+    button {
+      color: #ccc;
+      background: #000;
+      border: 1px solid #ccc;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 
 <body>
-  <button id="testButton">Play Tone 12</button>
+  <button id="testButton">Play Tone 13</button>
 
   <script>
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -15,7 +35,7 @@
     const gainNode = audioCtx.createGain();
     osc.type = 'sine';
     osc.frequency.value = 440;
-    gainNode.gain.value = 7.5;
+    gainNode.gain.value = .5;
     const testButton = document.getElementById('testButton');
 
     testButton.addEventListener('click', onPlayHandler);
@@ -28,8 +48,8 @@
       }
       osc.connect(gainNode);
       gainNode.connect(audioCtx.destination);
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.5);
+      osc[osc.start ? 'start' : 'noteOn'](0);
+      osc.stop(audioCtx.currentTime + 0.05);
     }
   </script>
 </body>
