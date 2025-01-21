@@ -3,17 +3,24 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>iOS Audio Test 13</title>
+  <title>iOS Audio Test 14</title>
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
+    html, body {
+      height: 100%;
+    }
     body {
       color: #ccc;
       background: #000;
       text-align: center;
       font-family: Arial, sans-serif;
       font-size: 16px;
-      padding: 20px;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
     button {
       color: #ccc;
@@ -23,14 +30,45 @@
       font-size: 16px;
       cursor: pointer;
     }
+    #overlay {
+      position: absolute;
+      z-index: 1;
+      top: 0;
+      left: 0;
+      background: rgba(0, 0, 0, 80%);
+      width: 100vw;
+      height: 100vh;
+      width: 100%;
+      height: 100%;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      box-sizing: border-box;
+      cursor: pointer;
+    }
+    #overlay.visible {
+      display: flex;
+    }
   </style>
 </head>
 
 <body>
-  <button id="testButton">Play Tone 13</button>
+  <div id="overlay" class="hidden"></div>
+  <button id="testButton">Play Tone 14</button>
 
   <script>
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    if (audioCtx.state === 'suspended') {
+      const overlay = document.getElementById('overlay');
+      overlay.className = 'visible';
+      document.addEventListener('click', () => {
+        audioCtx.resume().then(() => {
+          overlay.className = 'hidden';
+        });
+      }, { once: true });
+    }
+
     const osc = audioCtx.createOscillator();
     const gainNode = audioCtx.createGain();
     osc.type = 'sine';
