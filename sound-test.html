@@ -60,10 +60,11 @@
   <button id="testButton">Play Tone 14</button>
 
   <script>
+    const contextState = document.getElementById('contextState');
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    document.getElementById('contextState').textContent = audioCtx.state;
+    contextState.textContent = audioCtx.state;
     setInterval(() => {
-      document.getElementById('contextState').textContent = audioCtx.state;
+      contextState.textContent = audioCtx.state;
     }, 500);
     if (audioCtx.state === 'suspended') {
       const overlay = document.getElementById('overlay');
