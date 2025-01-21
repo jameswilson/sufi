@@ -75,11 +75,6 @@
       }, { once: true });
     }
 
-    const osc = audioCtx.createOscillator();
-    const gainNode = audioCtx.createGain();
-    osc.type = 'sine';
-    osc.frequency.value = 440;
-    gainNode.gain.value = .5;
     const testButton = document.getElementById('testButton');
 
     testButton.addEventListener('click', onPlayHandler);
@@ -88,10 +83,15 @@
       if (audioCtx.state !== 'running') {
         await audioCtx.resume();
       }
+      const osc = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = 440;
+      gainNode.gain.value = .5;
       osc.connect(gainNode);
       gainNode.connect(audioCtx.destination);
       osc[osc.start ? 'start' : 'noteOn'](0);
-      osc.stop(audioCtx.currentTime + 0.05);
+      osc.stop(audioCtx.currentTime + 0.5);
     }
   </script>
 </body>
