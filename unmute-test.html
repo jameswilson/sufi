@@ -15,7 +15,9 @@
   <div id="err" style="display: none"></div>
   <script>
     let context = new (window.AudioContext || window.webkitAudioContext)();
-    unmute(context);
+    let allowBackgroundPlayback = true;
+    let forceIOSBehavior = false;
+    unmute(context, allowBackgroundPlayback, forceIOSBehavior);
 
     let source;
 
@@ -53,7 +55,7 @@
       if (source) {
         source.start();
         document.getElementById("btn").style.display = "none";
-        document.getElementById("loading").innerHTML = "Audio should be playing. If you're on ios it should playing even with the mute switch on AND you should not see a media playback widget. It should pause if you switch tabs / minimize the window / lock the device and resume when you return to it. Enjoy.";
+        document.getElementById("loading").innerHTML = "Audio should be playing. If you're on ios it should play even with the mute switch on AND you should not see a media playback widget. It should continue to play if you switch tabs / minimize the window / lock the device. Enjoy.";
         document.getElementById("loading").style.removeProperty("display");
       }
     }
