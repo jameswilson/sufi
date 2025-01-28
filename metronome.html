@@ -113,8 +113,7 @@
   </label>
 </header>
   <div id="playerWrapper">
-    <audio id="woodblock" src="freesound.org-692819-woodblock.mp3"></audio>
-    <audio id="chime" src="freesound.org-240934-bell-low.mp3"></audio>
+    <audio id="tickTone" src="freesound.org-692819-woodblock.mp3"></audio>
 
     <div id="metronomeControls">
       <button id="toggleButton" aria-label="Play">
@@ -183,9 +182,9 @@
       </select>
     </div>
   </div>
+  <script src="unmute.min.js"></script>
   <script>
-    const audioElement = document.getElementById("woodblock");
-    const chimeElement = document.getElementById("chime");
+    const tickTone = document.getElementById("tickTone");
     const toggleButton = document.getElementById("toggleButton");
     const testChimeButton = document.getElementById("testChimeButton");
     const playIcon = document.getElementById("playIcon");
@@ -194,86 +193,123 @@
     const chimeToneSelect = document.getElementById("chimeTone");
     const timerDisplay = document.getElementById("timer");
 
-    let playInterval = null;
-    let timerInterval = null;
-    const tickIntervalMs = 1000; // 1 second (60 BPM)
+    let metronomeId = null;
+    let timerId = null;
+    const tickIntervalMs = 1000; // 1 second (60 BPM).
     let chimeIntervalMs = parseFloat(chimeIntervalSelect.value) * 60000;
 
     let secondsElapsed = 0;
-    let nextChimeAt = chimeIntervalMs / 1000; // Next chime time in seconds
+    let nextChimeAt = chimeIntervalMs / 1000; // Next chime time in seconds.
     let nextTickTime = 0;
+
+    // Storage for both raw and decoded audio buffers.
+    let rawBuffers = {};
     let audioBuffers = {};
 
-    // Initialize Web Audio API context with better timing
-    let audioContext = null;
-
-    async function initAudio() {
-      if (!audioContext) {
-        audioContext = new AudioContext({
-          latencyHint: "interactive",
-          sampleRate: 48000
-        });
-
-        // Pre-load and decode audio files
-        const response = await fetch(audioElement.src);
-        const arrayBuffer = await response.arrayBuffer();
-        audioBuffers.woodblock = await audioContext.decodeAudioData(arrayBuffer);
-
-        const chimeResponse = await fetch(chimeElement.src);
-        const chimeBuffer = await chimeResponse.arrayBuffer();
-        audioBuffers.chime = await audioContext.decodeAudioData(chimeBuffer);
+    // Fetch an audio file and store its array buffer.
+    async function fetchAudioFile(url) {
+      if (rawBuffers[url]) {
+        return rawBuffers[url];
       }
-
-      if (audioContext.state === "suspended") {
-        await audioContext.resume();
+      try {
+        const response = await fetch(url);
+        const arrayBuffer = await response.arrayBuffer();
+        rawBuffers[url] = arrayBuffer;
+        return arrayBuffer;
+      } catch (error) {
+        console.error(`Failed to fetch audio file ${url}:`, error);
+        throw error;
       }
     }
 
-    // Precise sound scheduling using Web Audio API
+    // Get the specified audio buffer.
+    async function getAudioBuffer(url) {
+      if (audioBuffers[url]) {
+        return audioBuffers[url];
+      }
+      try {
+        let arrayBuffer = rawBuffers[url] || await fetchAudioFile(url);
+        const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+        audioBuffers[url] = audioBuffer;
+        return audioBuffer;
+      } catch (error) {
+        console.error(`Failed to decode audio data for ${url}:`, error);
+        throw error;
+      }
+    }
+
+    // Pre-fetch audio files on page load.
+    fetchAudioFile(tickTone.src);
+    fetchAudioFile(chimeToneSelect.value);
+
+    // Initialize Web Audio API context.
+    // This cannot be done on page load because of browser security policies,
+    // so it is done upo the first user interaction, i.e. when the metronome
+    // is started or the chime is tested.
+    let audioContext = null;
+    async function initAudio() {
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+
+      // Preload audio buffers.
+      await getAudioBuffer(tickTone.src);
+      await getAudioBuffer(chimeToneSelect.value);
+
+      // Unmute the audio context.
+      let allowBackgroundPlayback = true;
+      let forceIOSBehavior = false;
+      unmute(audioContext, allowBackgroundPlayback, forceIOSBehavior);
+    }
+
+    // Precise sound scheduling using Web Audio API.
     function scheduleSound(buffer, time) {
       const source = audioContext.createBufferSource();
       source.buffer = buffer;
-      source.connect(audioContext.destination);
-      source.start(time);
+      const volume = audioContext.createGain();
+      source.connect(volume);
+      volume.connect(audioContext.destination);
+      const nearestSecond = Math.ceil(time);
+
+      volume.gain.value = 0.25;
+      source.start(nearestSecond);
     }
 
-    // Start the metronome with precise timing
+    // Start the metronome.
     async function startMetronome() {
       await initAudio();
 
+      const tickBuffer = await getAudioBuffer(tickTone.src);
+
       nextTickTime = audioContext.currentTime;
-      scheduleSound(audioBuffers.woodblock, nextTickTime);
+      scheduleSound(tickBuffer, nextTickTime);
 
-      // Schedule multiple ticks ahead to ensure smooth playback
-      function scheduler() {
-        while (nextTickTime < audioContext.currentTime + 0.1) {
-          scheduleSound(audioBuffers.woodblock, nextTickTime);
-          nextTickTime += tickIntervalMs / 1000;
-        }
-        playInterval = requestAnimationFrame(scheduler);
-      }
+      metronomeId = setInterval(() => {
+        scheduleSound(tickBuffer, audioContext.currentTime + 0.1);
+      }, 1000);
 
-      scheduler();
       resetTimer();
       startTimer();
       toggleIcons(true);
     }
 
-    // Stop the metronome and chime
+    // Stop the metronome and chime.
     function stopMetronome() {
-      cancelAnimationFrame(playInterval);
-      clearInterval(timerInterval);
-      playInterval = null;
+      clearInterval(metronomeId);
+      clearInterval(timerId);
+      metronomeId = null;
       toggleIcons(false);
     }
 
-    // Play selected chime tone on test button click
+    // Play selected chime tone on test button click.
     testChimeButton.addEventListener("click", async () => {
       await initAudio();
-      scheduleSound(audioBuffers.chime, audioContext.currentTime);
+      const chimeBuffer = await getAudioBuffer(chimeToneSelect.value);
+      const immediate = 0;
+      scheduleSound(chimeBuffer, immediate);
     });
 
-    // Toggle button icons and label
+    // Toggle button icons and label.
     function toggleIcons(isPlaying) {
       if (isPlaying) {
         playIcon.style.display = "none";
@@ -286,26 +322,26 @@
       }
     }
 
-    // Update chime interval on dropdown change
+    // Update chime interval on dropdown change.
     chimeIntervalSelect.addEventListener("change", () => {
       chimeIntervalMs = parseFloat(chimeIntervalSelect.value) * 60000;
       if (chimeIntervalMs > 0) {
-        nextChimeAt = Math.ceil(secondsElapsed / (chimeIntervalMs / 1000)) * (chimeIntervalMs / 1000);
+        nextChimeAt = Math.ceil(secondsElapsed / (chimeIntervalMs / 1000)) * (chimeIntervalMs / 1000) - 1;
       } else {
         nextChimeAt = Infinity;
       }
     });
 
-    // Update chime tone on dropdown change
+    // Update chime tone on dropdown change.
     chimeToneSelect.addEventListener("change", async () => {
       const response = await fetch(chimeToneSelect.value);
       const arrayBuffer = await response.arrayBuffer();
       audioBuffers.chime = await audioContext.decodeAudioData(arrayBuffer);
     });
 
-    // Timer functions
+    // Timer functions.
     function startTimer() {
-      timerInterval = setInterval(() => {
+      timerId = setInterval(() => {
         secondsElapsed++;
         updateTimerDisplay();
         checkChime();
@@ -313,7 +349,7 @@
     }
 
     function resetTimer() {
-      clearInterval(timerInterval);
+      clearInterval(timerId);
       secondsElapsed = 0;
       updateTimerDisplay();
       nextChimeAt = chimeIntervalMs > 0 ? chimeIntervalMs / 1000 : Infinity;
@@ -325,7 +361,7 @@
       timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
     }
 
-    // Check if it's time to play the chime
+    // Check if it's time to play the chime.
     function checkChime() {
       if (chimeIntervalMs > 0 && secondsElapsed >= nextChimeAt) {
         scheduleSound(audioBuffers.chime, audioContext.currentTime);
@@ -333,40 +369,26 @@
       }
     }
 
-    // Toggle metronome on button click
+    // Toggle metronome on button click.
     toggleButton.addEventListener("click", async () => {
       if (!audioContext) {
-        audioContext = new AudioContext({
-          latencyHint: "interactive",
-          sampleRate: 48000
-        });
-
-        // Pre-load and decode audio files
-        const response = await fetch(audioElement.src);
-        const arrayBuffer = await response.arrayBuffer();
-        audioBuffers.woodblock = await audioContext.decodeAudioData(arrayBuffer);
-
-        const chimeResponse = await fetch(chimeElement.src);
-        const chimeBuffer = await chimeResponse.arrayBuffer();
-        audioBuffers.chime = await audioContext.decodeAudioData(chimeBuffer);
+        await initAudio();
       }
 
-      if (audioContext.state === "suspended") {
-        await audioContext.resume();
-      }
-
-      if (playInterval === null) {
+      if (metronomeId === null) {
         startMetronome();
       } else {
         stopMetronome();
       }
     });
 
-    // Clean up when page is closed
+    // Clean up when page is closed.
     window.addEventListener("beforeunload", () => {
-      if (playInterval !== null) {
-        cancelAnimationFrame(playInterval);
-        clearInterval(timerInterval);
+      if (metronomeId !== null) {
+        clearInterval(metronomeId);
+      }
+      if (timerId !== null) {
+        clearInterval(timerId);
       }
       if (audioContext) {
         audioContext.close();
