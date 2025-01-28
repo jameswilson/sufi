@@ -41,17 +41,17 @@
   <div id="loading">Loading. Please wait..</div>
   <div id="err" style="display: none"></div>
   <script>
-    let context = new (window.AudioContext || window.webkitAudioContext)();
-    let allowBackgroundPlayback = true;
-    let forceIOSBehavior = false;
-    unmute(context, allowBackgroundPlayback, forceIOSBehavior);
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const allowBackgroundPlayback = true;
+    const forceIOSBehavior = false;
+    unmute(audioContext, allowBackgroundPlayback, forceIOSBehavior);
 
     let source;
 
     function decodeAudioData_success(audioBuffer) {
-      source = context.createBufferSource();
+      source = audioContext.createBufferSource();
       source.buffer = audioBuffer;
-      source.connect(context.destination);
+      source.connect(audioContext.destination);
 
       document.getElementById("loading").style.display = "none";
       document.getElementById("btn").onclick = play;
@@ -60,7 +60,7 @@
 
     fetch("freesound.org-692819-woodblock.mp3")
       .then(response => response.arrayBuffer())
-      .then(arrayBuffer => context.decodeAudioData(arrayBuffer))
+      .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
       .then(decodeAudioData_success)
       .catch(error => {
         console.log(error);
@@ -83,12 +83,12 @@
     }
 
     function playSound(audioBuffer, fadeIn = false) {
-      const source = context.createBufferSource();
+      const source = audioContext.createBufferSource();
       source.buffer = audioBuffer;
-      const volume = context.createGain();
+      const volume = audioContext.createGain();
       source.connect(volume);
-      volume.connect(context.destination);
-      const now = context.currentTime;
+      volume.connect(audioContext.destination);
+      const now = audioContext.currentTime;
       const nextSecond = Math.ceil(now);
 
       volume.gain.value = fadeIn ? 0.5 : 0.01;
