@@ -52,7 +52,6 @@
       source = context.createBufferSource();
       source.buffer = audioBuffer;
       source.connect(context.destination);
-      source.loop = true;
 
       document.getElementById("loading").style.display = "none";
       document.getElementById("btn").onclick = play;
@@ -79,12 +78,27 @@
     xhr.send();
 
     function play() {
-      if (source) {
-        source.start();
+      if (source && source.buffer) {
+        const audioBuffer = source.buffer;
+        playSound(audioBuffer);
+        setInterval(() => {
+          playSound(audioBuffer);
+        }, 1000);
+
         document.getElementById("btn").style.display = "none";
-        document.getElementById("loading").innerHTML = "Audio should be playing. If you're on ios it should play even with the mute switch on AND you should not see a media playback widget. It should continue to play if you switch tabs / minimize the window / lock the device. Enjoy.";
+        document.getElementById("loading").innerHTML = "Audio should be playing every second. If you're on ios it should play even with the mute switch on AND you should not see a media playback widget. It should continue to play if you switch tabs / minimize the window / lock the device. Reload the page to stop playing.";
         document.getElementById("loading").style.removeProperty("display");
       }
+    }
+
+    function playSound(audioBuffer) {
+      const source = context.createBufferSource();
+      source.buffer = audioBuffer;
+      source.connect(context.destination);
+
+      const now = context.currentTime;
+      const nextSecond = Math.ceil(now);
+      source.start(nextSecond);
     }
   </script>
 
