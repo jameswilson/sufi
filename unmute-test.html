@@ -58,31 +58,22 @@
       document.getElementById("btn").style.removeProperty("display");
     }
 
-    function decodeAudioData_error(error) {
-      console.log("error decoding audio data", error);
-      document.getElementById("err").style.removeProperty("display");
-      document.getElementById("err").innerHTML = "Error decoding mp3";
-    }
-
-    let xhr = new XMLHttpRequest();
-    xhr.open("GET", "freesound.org-692819-woodblock.mp3");
-    xhr.responseType = "arraybuffer";
-    xhr.onload = function () {
-      let promise = context.decodeAudioData(xhr.response, decodeAudioData_success, decodeAudioData_error);
-      if (promise) promise.then(decodeAudioData_success, decodeAudioData_error).catch(decodeAudioData_error);
-    }
-    xhr.onerror = xhr.onabort = function () {
-      document.getElementById("err").style.removeProperty("display");
-      document.getElementById("err").innerHTML = "Error loading mp3";
-    }
-    xhr.send();
+    fetch("freesound.org-692819-woodblock.mp3")
+      .then(response => response.arrayBuffer())
+      .then(arrayBuffer => context.decodeAudioData(arrayBuffer))
+      .then(decodeAudioData_success)
+      .catch(error => {
+        console.log(error);
+        document.getElementById("err").style.removeProperty("display");
+        document.getElementById("err").innerHTML = error.message || "Error loading mp3";
+      });
 
     function play() {
       if (source && source.buffer) {
         const audioBuffer = source.buffer;
         playSound(audioBuffer);
         setInterval(() => {
-          playSound(audioBuffer);
+          playSound(audioBuffer, true);
         }, 1000);
 
         document.getElementById("btn").style.display = "none";
@@ -91,13 +82,16 @@
       }
     }
 
-    function playSound(audioBuffer) {
+    function playSound(audioBuffer, fadeIn = false) {
       const source = context.createBufferSource();
       source.buffer = audioBuffer;
-      source.connect(context.destination);
-
+      const volume = context.createGain();
+      source.connect(volume);
+      volume.connect(context.destination);
       const now = context.currentTime;
       const nextSecond = Math.ceil(now);
+
+      volume.gain.value = fadeIn ? 0.5 : 0.01;
       source.start(nextSecond);
     }
   </script>
