@@ -442,33 +442,71 @@ tr:last-child td {
 .card {
   max-width: 720px;
   margin: 2rem;
-  padding: 1rem;
-  background: var(--card);
-  border: 1px solid var(--ring);
+  padding: min(5vw, 1.5rem);
+  background: var(--background-secondary);
+  border: 1px solid var(--outline);
   border-radius: 12px;
 }
 
 .note {
   margin: 1.5rem 0;
-  padding: 1.5rem;
-  font-size: 0.95em;
+  padding: .95rem min(5vw, 1.5rem);
+  font-size: .95rem;
   background: var(--background-secondary);
-  border-radius: 12px;
   border: 1px solid var(--outline);
+  border-radius: 12px;
 }
 
-.note h2 {
+.note-title {
   font-family: var(--sans-serif);
-  font-size: 0.75rem;
+  font-size: .75rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.075em;
-  opacity: 0.55;
+  letter-spacing: .075em;
+  opacity: .55;
+}
+
+.note summary.note-title {
+  padding: .95rem min(5vw, 1.5rem) !important;
+  margin: -.95rem calc(min(5vw, 1.5rem) * -1) !important;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  margin-bottom: 0;
+  border-radius: 12px;
+}
+
+.note summary.note-title::-webkit-details-marker {
+  display: none;
+}
+
+.note summary.note-title::marker {
+  content: "";
+}
+
+.note > summary.note-title::before {
+  content: "";
+  width: 1.1em;
+  height: 1.1em;
+  flex: 0 0 1.1em;
+  opacity: 1;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 6l6 6-6 6' fill='none' stroke='%23000' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 6l6 6-6 6' fill='none' stroke='%23000' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+  transform: rotate(0deg);
+  transition: transform 0.2s ease-out;
+}
+
+.note[open] > summary.note-title::before {
+  transform: rotate(90deg);
 }
 
 .note * {
-  margin-top: 1em;
-  margin-bottom: 1em;
+  margin-top: .95rem;
+  margin-bottom: .95rem;
 }
 
 .note :first-child {
