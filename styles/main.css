@@ -449,9 +449,12 @@ tr:last-child td {
 }
 
 .note {
+  margin: 1.5rem 0;
   padding: 1.5rem;
   font-size: 0.95em;
   background: var(--background-secondary);
+  border-radius: 12px;
+  border: 1px solid var(--outline);
 }
 
 .note h2 {
