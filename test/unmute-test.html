@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>unmute.js Test Page</title>
-  <script src="unmute.min.js"></script>
+  <script src="../scripts/unmute.min.js"></script>
   <style>
     html, body {
       height: 100%;
@@ -58,7 +58,7 @@
       document.getElementById("btn").style.removeProperty("display");
     }
 
-    fetch("freesound.org-692819-woodblock.mp3")
+    fetch("../sounds/freesound.org-692819-woodblock.mp3")
       .then(response => response.arrayBuffer())
       .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
       .then(decodeAudioData_success)

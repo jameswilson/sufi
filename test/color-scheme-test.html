@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#fff">
+  <title>Color Scheme Test</title>
+
+  <script>(function(){var k="theme",d=document.documentElement,m=matchMedia("(prefers-color-scheme:dark)");function r(c){return c==="dark"||c==="light"?c:m.matches?"dark":"light"}function g(){return localStorage.getItem(k)||"system"}function a(c){var v=r(c||g());d.classList.toggle("dark",v==="dark");d.classList.toggle("light",v==="light");d.style.colorScheme=v;var meta=document.querySelector('meta[name="theme-color"]');if(meta){meta.content=v==="dark"?"#0b0b0c":"#fff"}}a();m.addEventListener&&m.addEventListener("change",function(){g()==="system"&&a("system")});addEventListener("themechoice",function(e){a(e&&e.detail)});addEventListener("storage",function(e){if(e&&e.key===k){a(e.newValue||"system")}})})();</script>
+
+  <style>
+    html {
+      color-scheme: light dark;
+    }
+
+    :root {
+      --bg: #ffffff;
+      --fg: #111111;
+      --muted: #666666;
+      --card: #f6f6f7;
+      --ring: #d0d0d4;
+    }
+    :root.dark {
+      --bg: #0b0b0c;
+      --fg: #e7e7e7;
+      --muted: #a9a9ad;
+      --card: #151517;
+      --ring: #2a2a2d;
+    }
+
+    /* (optional) no-JS fallback */
+    @media (prefers-color-scheme: dark) {
+      :root:not(.light):not(.dark) {
+        --bg: #0b0b0c;
+        --fg: #e7e7e7;
+        --muted: #a9a9ad;
+        --card: #151517;
+        --ring: #2a2a2d;
+      }
+    }
+
+    *,
+    *::before,
+    *::after {
+      transition-property: color, background, border, outline, fill, stroke;
+      transition-delay: 0s;
+      transition-duration: 0.2s;
+      transition-timing-function: ease-out;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    [hidden] {
+      display: none
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100svh;
+      display: grid;
+      place-items: center;
+      gap: 1rem;
+      font: 16px/1.4 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+    }
+
+    label {
+      display: inline-flex;
+      gap: .5rem;
+      align-items: center;
+    }
+
+    select {
+      background: var(--card);
+      color: inherit;
+      border: 1px solid var(--ring);
+      padding: .25rem .5rem;
+      border-radius: 8px;
+      font: inherit;
+    }
+
+    .theme-picker {
+      display: inline-flex;
+      gap: .5rem;
+      align-items: center;
+    }
+
+    .theme-picker select {
+      background: var(--card);
+      color: inherit;
+      border: 1px solid var(--ring);
+      padding: .25rem .5rem;
+      border-radius: 8px;
+    }
+
+    .muted {
+      opacity: .75
+    }
+
+    #toggle-theme {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      background: transparent;
+      border: 0;
+      color: inherit;
+      cursor: pointer;
+    }
+
+    .card {
+      max-width: 720px;
+      margin: 2rem;
+      padding: 1rem;
+      background: var(--card);
+      border: 1px solid var(--ring);
+      border-radius: 12px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <p class="muted">Defaults to your OS; choose an override if you want.</p>
+
+    <div class="theme-picker">
+      <button type="button" id="toggle-theme" aria-label="Theme">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+          viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+          stroke-linecap="round" stroke-linejoin="round" role="img" aria-hidden="true"
+          class="lucide lucide-sun-moon-icon lucide-sun-moon" data-preset="system">
+          <path d="M12 2v2M16 12a4 4 0 0 0-4-4M19 5l-1.256 1.256M20 12h2" />
+          <path
+            d="M14.837 16.385a6 6 0 1 1-7.223-7.222c.624-.147.97.66.715 1.248a4 4 0 0 0 5.26 5.259c.589-.255 1.396.09 1.248.715" />
+        </svg>
+
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" hidden
+          viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+          stroke-linecap="round" stroke-linejoin="round" role="img" aria-hidden="true"
+          class="lucide lucide-sun-icon lucide-sun" data-preset="light">
+          <circle cx="12" cy="12" r="4" />
+          <path
+            d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+        </svg>
+
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" hidden
+          viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+          stroke-linecap="round" stroke-linejoin="round" role="img" aria-hidden="true"
+          class="lucide lucide-moon-icon lucide-moon" data-preset="dark">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+        </svg>
+      </button>
+      <label>Theme
+        <select id="theme">
+          <option value="system">system</option>
+          <option value="light">light</option>
+          <option value="dark">dark</option>
+        </select>
+      </label>
+    </div>
+  </div>
+  <script>
+    (function () {
+      var ORDER = ['system', 'light', 'dark'];
+      var btn = document.getElementById('toggle-theme');
+      var select = document.getElementById('theme');
+      var STORAGE_KEY = 'theme';
+      var EVENT_NAME = 'themechoice';
+
+      function getChoice() {
+        return localStorage.getItem(STORAGE_KEY) || 'system';
+      }
+
+      function setChoice(choice) {
+        localStorage.setItem(STORAGE_KEY, choice);
+        window.dispatchEvent(new CustomEvent(EVENT_NAME, { detail: choice }));
+      }
+
+      function syncThemeUi(choice) {
+        choice = choice || getChoice();
+        var svgs = btn.querySelectorAll('[data-preset]');
+        for (var i = 0; i < svgs.length; i++) {
+          var on = svgs[i].getAttribute('data-preset') === choice;
+          svgs[i].style.display = on ? 'block' : 'none';
+        }
+        select.value = choice;
+        btn.setAttribute(
+          'aria-label',
+          'Theme: ' + choice + '. Click to cycle system, light, dark.'
+        );
+      }
+
+      function cycleTheme() {
+        var i = ORDER.indexOf(getChoice());
+        var next = ORDER[(i + 1) % ORDER.length];
+        setChoice(next);
+        syncThemeUi(next);
+      }
+
+      select.addEventListener('change', function () {
+        setChoice(select.value);
+        syncThemeUi(select.value);
+      });
+
+      btn.addEventListener('click', cycleTheme);
+
+      syncThemeUi(getChoice());
+    })();
+  </script>
+</body>
+
+</html>
