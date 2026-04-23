@@ -4,7 +4,9 @@
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="toggle.js"></script>
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#fff">
+<script>(function(){var k="theme",d=document.documentElement,m=matchMedia("(prefers-color-scheme:dark)");function r(c){return c==="dark"||c==="light"?c:m.matches?"dark":"light"}function g(){return localStorage.getItem(k)||"system"}function a(c){var v=r(c||g());d.classList.toggle("dark",v==="dark");d.classList.toggle("light",v==="light");d.style.colorScheme=v;var meta=document.querySelector('meta[name="theme-color"]');if(meta){meta.content=v==="dark"?"#0b0b0c":"#fff"}}a();m.addEventListener&&m.addEventListener("change",function(){g()==="system"&&a("system")});addEventListener("themechoice",function(e){a(e&&e.detail)});addEventListener("storage",function(e){if(e&&e.key===k){a(e.newValue||"system")}})})();</script>
 <link rel="stylesheet" href="styles/reset.css">
 <link rel="stylesheet" href="styles/main.css">
 <link rel="stylesheet" href="styles/print.css" media="print">
@@ -12,19 +14,19 @@
 </head>
 <body>
 <header>
-  <input id="light-mode" class="toggle visually-hidden" type="checkbox">
-  <label for="light-mode">
-    <svg class="dark" width="22" height="22">
-      <title>Bright light</title>
-      <path fill="currentColor"
-        d="M10.82 4.2c.46 0 .84-.38.84-.85v-2.1a.85.85 0 0 0-.84-.85.85.85 0 0 0-.85.85v2.1c0 .47.39.85.85.85m4.79 2c.33.32.87.33 1.2 0l1.5-1.5a.87.87 0 0 0 0-1.2.85.85 0 0 0-1.2 0L15.61 5a.85.85 0 0 0 0 1.2m1.98 4.8c0 .45.4.83.85.83h2.1c.46 0 .84-.38.84-.83a.85.85 0 0 0-.84-.85h-2.1c-.46 0-.85.39-.85.85m-1.98 4.79a.85.85 0 0 0 0 1.2l1.5 1.5c.33.33.87.3 1.2 0a.86.86 0 0 0 0-1.2l-1.5-1.5a.86.86 0 0 0-1.2 0m-4.79 2a.85.85 0 0 0-.85.84v2.11c0 .46.39.84.85.84s.84-.38.84-.84v-2.1a.85.85 0 0 0-.84-.85m-4.8-2a.9.9 0 0 0-1.2 0l-1.49 1.5a.86.86 0 0 0 0 1.19c.32.3.87.33 1.2 0l1.49-1.5a.86.86 0 0 0 0-1.19m-1.97-4.8c0-.45-.4-.84-.85-.84H1.1c-.46 0-.84.39-.84.85s.38.83.84.83h2.1c.46 0 .85-.38.85-.83M6.02 6.2a.86.86 0 0 0 0-1.2L4.55 3.5a.86.86 0 0 0-1.2 0 .86.86 0 0 0 0 1.2l1.49 1.5c.32.32.86.32 1.19 0M10.81 15.97a4.97 4.97 0 1 0 0-9.95 4.97 4.97 0 0 0 0 9.95" />
+  <button type="button" id="toggle-theme" aria-label="Theme: system. Click to cycle system, light, dark.">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" role="img" aria-hidden="true" data-preset="system">
+      <path d="M12 2v2M16 12a4 4 0 0 0-4-4M19 5l-1.256 1.256M20 12h2" />
+      <path d="M14.837 16.385a6 6 0 1 1-7.223-7.222c.624-.147.97.66.715 1.248a4 4 0 0 0 5.26 5.259c.589-.255 1.396.09 1.248.715" />
     </svg>
-    <svg class="light" width="22" height="22">
-      <title>Low light</title>
-      <path fill="currentColor"
-        d="M16.34 14.48c-5.29 0-8.67-3.3-8.67-8.6 0-1.21.27-2.69.62-3.5q.12-.33.1-.46c0-.25-.19-.54-.58-.54-.1 0-.34.02-.56.1-3.6 1.44-6.02 5.23-6.02 9.2a10.1 10.1 0 0 0 10.1 10.09c4.2 0 7.73-2.55 8.97-5.71.09-.24.1-.48.1-.57 0-.37-.28-.6-.56-.6-.12 0-.23.02-.42.08-.76.25-1.88.51-3.08.51" />
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" hidden viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" role="img" aria-hidden="true" data-preset="light">
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
     </svg>
-  </label>
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" hidden viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" role="img" aria-hidden="true" data-preset="dark">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+    </svg>
+  </button>
 </header>
 <main>
 <h1>Oraciones Sufis - Hazrat Inayat Khan</h1>
@@ -131,5 +133,6 @@ y únenos a todos en Tu perfecto Ser.
 
 </main>
 <div class="back-to-top"><a href="#"><svg width="24" height="24" fill="currentColor" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M15.146 10.737 8 4.69.854 10.737l1.292 1.526L8 7.31l5.854 4.953 1.292-1.526Z" /></svg></a></div>
+<script src="scripts/toggle-theme.js"></script>
 </body>
 </html>
