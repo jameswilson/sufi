@@ -1,0 +1,83 @@
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#playerWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin: auto;
+  max-width: 300px;
+}
+
+#chimeIntervalControls,
+#metronomeControls,
+#chimeControls {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  line-height: normal;
+}
+
+#playerWrapper button svg {
+  max-width: 30px;
+  height: auto;
+}
+
+#metronomeControls {
+  font-size: 2.5rem;
+  height: 3rem;
+}
+
+#chimeControls,
+#chimeIntervalControls {
+  font-size: 1.2rem;
+}
+
+#toggleButton {
+  width: 1.5em;
+  height: 1.5em;
+  cursor: pointer;
+  border: none;
+  background: none;
+  outline: none;
+}
+
+#testChimeButton,
+#chimeIntervalLabel {
+  width: 30px;
+  height: 30px;
+  min-width: 30px;
+  min-height: 30px;
+  max-width: 30px;
+  max-height: 30px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#chimeInterval,
+#chimeTone {
+  width: 100%;
+}
+
+.icon {
+  width: 100%;
+  height: 100%;
+}

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
   <meta charset="UTF-8">
@@ -12,12 +12,12 @@
   <link rel="stylesheet" href="styles/main.css">
   <link rel="stylesheet" href="styles/metronome.css">
   <link rel="stylesheet" href="styles/print.css" media="print">
-  <title>Metronome</title>
+  <title>Metrónomo</title>
 </head>
 
 <body>
 <header>
-  <button type="button" id="toggle-theme" aria-label="Theme: system. Click to cycle system, light, dark.">
+  <button type="button" id="toggle-theme" aria-label="Tema: sistema. Haz clic para cambiar entre sistema, claro, oscuro.">
     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" role="img" aria-hidden="true" data-preset="system">
       <path d="M12 2v2M16 12a4 4 0 0 0-4-4M19 5l-1.256 1.256M20 12h2" />
       <path d="M14.837 16.385a6 6 0 1 1-7.223-7.222c.624-.147.97.66.715 1.248a4 4 0 0 0 5.26 5.259c.589-.255 1.396.09 1.248.715" />
@@ -64,18 +64,18 @@
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M6 13.25h2M11 5.75a4 4 0 1 0-8 0v3.5a1.5 1.5 0 0 1-1.5 1.5h11a1.5 1.5 0 0 1-1.5-1.5zM.5 5.62A6 6 0 0 1 3 .75M13.5 5.62A6 6 0 0 0 11 .75"/></svg>
       </button>
       <!-- Chime Tone Dropdown -->
-      <label class="visually-hidden" for="chimeTone">Tone</label>
+      <label class="visually-hidden" for="chimeTone">Tono</label>
       <select id="chimeTone">
-        <option value="sounds/freesound.org-390543-bell-mid.mp3">bell</option>
-        <option value="sounds/freesound.org-347379-bell-high.mp3">chime</option>
-        <option value="sounds/freesound.org-240934-bell-low.mp3">gong</option>
+        <option value="sounds/freesound.org-390543-bell-mid.mp3">campana</option>
+        <option value="sounds/freesound.org-347379-bell-high.mp3">campana alta</option>
+        <option value="sounds/freesound.org-240934-bell-low.mp3">campana baja</option>
       </select>
     </div>
 
     <div id="chimeIntervalControls">
       <!-- Chime Interval Dropdown -->
       <label id="chimeIntervalLabel" for="chimeInterval">
-        <span class="visually-hidden">Interval</span>
+        <span class="visually-hidden">Intervalo</span>
         <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
           <g stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
             <path
@@ -87,17 +87,17 @@
         </svg>
       </label>
       <select id="chimeInterval">
-        <option value="0">off</option>
-        <option value="0.5">every 30 seconds</option>
-        <option value="1">every 1 minute</option>
-        <option value="2">every 2 minutes</option>
-        <option value="5">every 5 minutes</option>
-        <option value="10">every 10 minutes</option>
-        <option value="15">every 15 minutes</option>
-        <option value="20">every 20 minutes</option>
-        <option value="30">every 30 minutes</option>
-        <option value="45">every 45 minutes</option>
-        <option value="60">every 60 minutes</option>
+        <option value="0">apagado</option>
+        <option value="0.5">cada 30 segundos</option>
+        <option value="1">cada 1 minuto</option>
+        <option value="2">cada 2 minutos</option>
+        <option value="5">cada 5 minutos</option>
+        <option value="10">cada 10 minutos</option>
+        <option value="15">cada 15 minutos</option>
+        <option value="20">cada 20 minutos</option>
+        <option value="30">cada 30 minutos</option>
+        <option value="45">cada 45 minutos</option>
+        <option value="60">cada 60 minutos</option>
       </select>
     </div>
   </div>
