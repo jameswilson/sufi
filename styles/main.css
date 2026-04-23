@@ -1,58 +1,55 @@
 :root {
-  --color: #d69b03;
-  --outline: #ba8b12;
-  --background: #000;
   --font-size: calc(18px + 0.390625vw);
+  --sans-serif: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  --serif: Charter, 'Bitstream Charter', 'Sitka Text', Cambria, serif;
+
+  --color: #373020;
+  --outline: #ddd8cc;
+  --background: #fffcf5;
+  --background-secondary: #f5f2e8;
+  --bg-overlay: rgb(0 0 0 / 35%);
+}
+
+:root.dark {
+  --color: #b98605;
+  --outline: #29210e;
+  --background: #030200;
+  --background-secondary: #15130f;
+  --bg-overlay: rgb(0 0 0 / 60%);
 }
 
 @media (prefers-color-scheme: light) {
   :root {
-    --color: #333;
-    --outline: #aaa;
-    --background: #ddd;
+    --color: #373020;
+    --outline: #d0d0d4;
+    --background: #fffcf5;
+    --background-secondary: #f6f6f7;
+    --bg-overlay: rgb(0 0 0 / 35%);
   }
 }
 
 body:has(#light-mode:checked) {
-  --color: #333;
-  --outline: #aaa;
-  --background: #ddd;
+  --color: rgb(55 48 32);
+  --outline: rgb(130 119 90 / 15%);
+  --background: #fefcf5;
+  --background-secondary: rgb(229 222 203 / 15%);
 }
 
-label {
-  cursor: pointer;
+*,
+*::before,
+*::after {
+  transition-property: color, background, border, outline;
+  transition-delay: 0s;
+  transition-duration: 0.2s;
+  transition-timing-function: ease-out;
 }
 
-.visually-hidden {
-  clip: rect(0 0 0 0);
-  clip-path: inset(50%);
-  height: 1px;
-  overflow: hidden;
-  position: absolute;
-  white-space: nowrap;
-  width: 1px;
-}
-
-input.toggle + label {
-  width: 44px;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-input.toggle:focus-visible + label {
-  outline: solid var(--outline);
-}
-
-input.toggle + label .light,
-input.toggle:checked + label .dark {
-  display: none;
-}
-
-input.toggle + label .dark,
-input.toggle:checked + label .light {
-  display: block;
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+  }
 }
 
 html {
@@ -63,7 +60,7 @@ html {
 }
 
 body {
-  font-family: Charter, 'Bitstream Charter', 'Sitka Text', Cambria, serif;
+  font-family: var(--serif);
   font-weight: normal;
   font-size: 1rem;
   line-height: 1.62;
@@ -81,6 +78,56 @@ header {
   font-size: 0.825rem;
   text-align: right;
   padding: .25rem;
+}
+
+label {
+  cursor: pointer;
+}
+
+.visually-hidden {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+input.toggle-color-scheme + label {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  outline: solid transparent;
+}
+
+input.toggle-color-scheme:focus-visible + label {
+  outline: solid var(--outline);
+}
+
+input.toggle-color-scheme + label .light,
+input.toggle-color-scheme:checked + label .dark {
+  display: none;
+}
+
+input.toggle-color-scheme + label .dark,
+input.toggle-color-scheme:checked + label .light {
+  display: block;
+}
+
+.toggle-language {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: var(--sans-serif);
+  text-decoration: none;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  font-size: 14px;
 }
 
 main {
@@ -107,31 +154,32 @@ nav a[aria-current] {
 
 nav:has(:focus) a[aria-current]:not(:focus),
 nav:has(:hover) a[aria-current]:not(:hover) {
-  outline: none;
+  outline: solid transparent;
 }
 
 h1 {
   text-align: center;
-  font-size: 1.6rem;
+  font-size: 1.6em;
   line-height: normal;
   font-weight: normal;
 }
 
 h2 {
-  font-size: 1.6rem;
+  font-size: 1.6em;
   font-weight: normal;
   font-weight: normal;
-  margin-top: 1.5rem;
+  margin-top: 1.5em;
 }
 
 p {
   white-space: pre-wrap;
-  margin: 1.5rem 0;
+  margin: 1.5em 0;
 }
 
 a, a:visited {
   color: var(--color);
   text-decoration: underline;
+  outline: solid transparent;
 }
 
 a:focus,
@@ -143,9 +191,9 @@ select,
 option {
   color: var(--color);
   background: var(--background);
-  font-family: Charter, 'Bitstream Charter', 'Sitka Text', Cambria, serif;
+  font-family: var(--serif);
   font-weight: normal;
-  font-size: 1rem;
+  font-size: 1em;
   line-height: 1.62;
   text-align: left;
 }
@@ -153,9 +201,9 @@ option {
 button {
   border: none;
   background: none;
-  font-family: Charter, 'Bitstream Charter', 'Sitka Text', Cambria, serif;
+  font-family: var(--serif);
   font-weight: normal;
-  font-size: 1rem;
+  font-size: 1em;
   line-height: 1.62;
   color: var(--color);
 }
@@ -199,17 +247,17 @@ select {
 }
 
 ul {
-  margin-left: 1.5rem;
+  margin-left: 1.5em;
 }
 
 ul li {
-  margin-bottom: 1rem;
+  margin-bottom: 1em;
   line-height: 1.62;
   list-style: disc;
 }
 
 iframe {
-  margin: 3rem auto;
+  margin: 3em auto;
   display: block;
 }
 
@@ -218,10 +266,10 @@ iframe {
 }
 
 table {
-  font-family: 'BentonSans';
+  font-family: var(--sans-serif);
   font-style: normal;
   font-weight: 400;
-  font-size: .75rem;
+  font-size: .75em;
   line-height: 1.3;
 
   border-spacing: 0;
@@ -284,7 +332,7 @@ tr:last-child td {
   padding: 0.5px 10px 1.5px;
   gap: 4px;
   border-radius: 1000px;
-  font-family: 'BentonSans';
+  font-family: var(--sans-serif);
   font-weight: 500;
   font-size: 0.675rem;
   line-height: 1.5;
@@ -314,4 +362,41 @@ tr:last-child td {
 .badge-light {
   background: linear-gradient(141.55deg, #FFEFFD 4.88%, #FFBCFE 51.35%, #F4CBFF 57.69%, #E1BCFF 82.19%, #DABDFF 89.38%);
   border: 2px solid #C89EFF;
+}
+
+.card {
+  max-width: 720px;
+  margin: 2rem;
+  padding: 1rem;
+  background: var(--card);
+  border: 1px solid var(--ring);
+  border-radius: 12px;
+}
+
+.note {
+  padding: 1.5rem;
+  font-size: 0.95em;
+  background: var(--background-secondary);
+}
+
+.note h2 {
+  font-family: var(--sans-serif);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.075em;
+  opacity: 0.55;
+}
+
+.note * {
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+.note :first-child {
+  margin-top: 0;
+}
+
+.note :last-child {
+  margin-bottom: 0;
 }
